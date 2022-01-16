@@ -1,0 +1,9 @@
+'§6example':
+  player-command:
+    - 'example'
+  player-op-command:
+    - 'example'
+  console-command:
+    - 'example'
+  player-message:
+    - 'example'

@@ -1,0 +1,15 @@
+name: ItemCommand
+main: ml.mcos.itemcommand.ItemCommand
+version: 1.0.0
+api-version: 1.13
+author: myunco
+softdepend:
+  - PlaceholderAPI
+commands:
+  itemcommand:
+    usage: /ItemCommand <add|reload|version>
+    aliases: ic
+    permission: itemcommand.admin
+permissions:
+  itemcommand.admin:
+    default: op
