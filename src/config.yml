@@ -1,9 +1,38 @@
-'§6example':
-  player-command:
+#ID 不要重复 内容随意 不要包含 . 和空格
+'001':
+  #匹配物品显示名 可选
+  name: 'example'
+  #匹配物品Lore 可选
+  lore:
     - 'example'
-  player-op-command:
-    - 'example'
-  console-command:
-    - 'example'
-  player-message:
-    - 'example'
+  #匹配物品类型 可选 (虽然name,lore,type都是可选的,但至少要提供一个)
+  type: 'PAPER'
+  #物品使用后执行的动作 一行一个动作 可选(虽然可选 但应该不会有人留空吧?使用物品后没有任何动作有啥用???)
+  #可选的动作有: cmd,op,console,tell,chat,give-money,give-points 不指定默认为cmd
+  action:
+    #格式为 动作: 值
+    #动作后面紧跟一个英文冒号 否则无法识别出正确动作会默认为是cmd动作
+    #cmd = 让使用物品的玩家执行的命令 命令不需要加 /
+    - 'cmd: help'
+    #op = 让使用物品的玩家以op身份执行的命令 同样不需要加 /
+    - 'op: list'
+    #console = 让控制台执行的命令
+    - 'console: say hi {player}'
+    #tell = 给使用物品的玩家发送消息
+    - 'tell: hi {player}'
+    #chat = 让使用物品的玩家发送聊天消息
+    - 'chat: test'
+    #give-money = 给予使用物品的玩家指定数量的钱 只能为正整数 使用此功能需要安装Vault以及支持Vault的经济插件
+    - 'give-money: 10'
+    #give-points = 给予使用物品的玩家指定数量的点券 只能为正整数 使用此功能需要安装PlayerPoints插件
+    - 'give-points: 10'
+  #使用物品需要花费的钱 可选 不能为负数
+  price: 10
+  #使用物品需要花费的点券 可选 不能为负数
+  points: 10
+  #使用物品需要的权限 可选
+  permission: 'example'
+  #使用物品会消耗的数量 可选 不能为负数 物品数量不足不能使用 0表示不消耗物品
+  amount: 1
+  #冷却时间 单位秒 可选 不能为负数 如果设置了冷却时间 表示使用物品后必须等待指定的时间后才能再次使用物品(冷却期间其他物品也不能使用)
+  cooldown: 10

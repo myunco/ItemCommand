@@ -16,7 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
+//代码暂未实现配置文件列出的功能
 public class ItemCommand extends JavaPlugin implements Listener {
     private Set<String> names;
     private boolean enablePAPI;
