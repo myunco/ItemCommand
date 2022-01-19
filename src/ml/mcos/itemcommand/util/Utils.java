@@ -25,9 +25,24 @@ public class Utils {
         try {
             double d = Double.parseDouble(str);
             return Math.max(d, 0.0);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | NullPointerException e) {
             return -1.0;
         }
+    }
+
+    public static String getTextLeft(String text, char ch) {
+        int index = text.indexOf(ch);
+        return index == -1 ? "" : text.substring(0, index);
+    }
+
+    public static String getTextRight(String text, char ch) {
+        int index = text.indexOf(ch);
+        return index == -1 ? "" : text.substring(index + 1);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(getTextLeft("test:oops", ':'));
+        System.out.println(getTextRight("test:oops", ':'));
     }
 
 }
