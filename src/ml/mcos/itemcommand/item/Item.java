@@ -95,6 +95,9 @@ public class Item {
     }
 
     public boolean meetRequiredAmount(Player player, ItemStack item) {
+        if (item.getAmount() >= requiredAmount) {
+            return true;
+        }
         if (requiredAmount > 0 && player.getInventory().containsAtLeast(item, requiredAmount)) {
             player.sendMessage("§c你没有足够数量的物品用来使用。");
             return false;

@@ -138,18 +138,26 @@ public class ItemCommand extends JavaPlugin implements Listener {
     public void playerInteractEvent(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.HAND && event.hasItem()) {
             if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
-                Item item = Config.matchItem(event.getItem());
+                ItemStack itemStack = event.getItem();
+                Item item = Config.matchItem(itemStack);
                 if (item != null) {
                     Player player = event.getPlayer();
-                    if (item.hasPermission(player) && item.meetRequiredAmount(player, event.getItem()) && !isCooling(player) && item.charge(player)) {
+                    //noinspection ConstantConditions
+                    if (item.hasPermission(player) && item.meetRequiredAmount(player, itemStack) && !isCooling(player) && item.charge(player)) {
                         if (item.getCooldown() > 0) {
                             cdMap.put(player.getName(), System.currentTimeMillis() + item.getCooldown() * 1000L);
                         }
-                        if (item.getRequiredAmount() > 0) {
-                            //noinspection ConstantConditions
-                            ItemStack stack = event.getItem().clone();
-                            stack.setAmount(item.getRequiredAmount());
-                            player.getInventory().removeItem(stack);
+                        int requiredAmount = item.getRequiredAmount();
+                        if (requiredAmount > 0) {
+                            if (itemStack.getAmount() > requiredAmount) {
+                                itemStack.setAmount(itemStack.getAmount() - requiredAmount);
+                            } else if (itemStack.getAmount() == requiredAmount) {
+                                player.getInventory().setItemInMainHand(null);
+                            } else {
+                                ItemStack stack = itemStack.clone();
+                                stack.setAmount(requiredAmount);
+                                player.getInventory().removeItem(stack);
+                            }
                         }
                         item.executeAction(player);
                     }
