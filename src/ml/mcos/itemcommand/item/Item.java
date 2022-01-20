@@ -44,7 +44,7 @@ public class Item {
         if (name != null && (meta == null || !name.equals(meta.getDisplayName()))) {
             return false;
         }
-        if (lore != null && (meta == null || !lore.equals(meta.getLore()))) {
+        if (!lore.isEmpty() && (meta == null || !lore.equals(meta.getLore()))) {
             return false;
         }
         return type == null || type == item.getType();

@@ -30,6 +30,7 @@ import java.util.List;
 
 public class Config {
     private static final ArrayList<Item> items = new ArrayList<>();
+    public static final ArrayList<String> idList = new ArrayList<>();
     public static YamlConfiguration config;
     private static File configFile;
 
@@ -37,10 +38,17 @@ public class Config {
         plugin.saveDefaultConfig();
         configFile = new File(plugin.getDataFolder(), "config.yml");
         config = loadConfiguration(configFile);
+        if (!items.isEmpty()) {
+            items.clear();
+        }
+        if (!idList.isEmpty()) {
+            idList.clear();
+        }
         for (String id : config.getKeys(false)) {
             Item item = loadItem(plugin, id);
             if (item != null) {
                 items.add(item);
+                idList.add(id);
             }
         }
         plugin.getLogger().info("Loaded " + items.size() + " items.");
@@ -55,12 +63,13 @@ public class Config {
             return null;
         }
 
-        Material type;
-        try {
-            type = Material.valueOf(typeString);
-        } catch (IllegalArgumentException e) {
-            type = null;
-            plugin.getLogger().warning("加载 " + id + " 时出错! 未知的物品类型: type: " + typeString);
+        Material type = null;
+        if (typeString != null) {
+            try {
+                type = Material.valueOf(typeString);
+            } catch (IllegalArgumentException e) {
+                plugin.getLogger().warning("加载 " + id + " 时出错! 未知的物品类型: type: " + typeString);
+            }
         }
 
         List<String> actionList = config.getStringList(id + ".action");
@@ -107,19 +116,19 @@ public class Config {
         }
 
         String priceString = config.getString(id + ".price");
-        double price = Utils.parseDouble(priceString);
+        double price = priceString == null ? 0.0 : Utils.parseDouble(priceString);
         if (price == -1.0) {
             plugin.getLogger().warning("加载 " + id + " 时出错! 无效的花费: price: " + priceString);
         }
 
         String pointsString = config.getString(id + ".points");
-        int points = Utils.parseInt(pointsString);
+        int points = pointsString == null ? 0 : Utils.parseInt(pointsString);
         if (points == -1) {
             plugin.getLogger().warning("加载 " + id + " 时出错! 无效的花费: points: " + pointsString);
         }
 
         String levelsString = config.getString(id + ".levels");
-        int levels = Utils.parseInt(levelsString);
+        int levels = levelsString == null ? 0 : Utils.parseInt(levelsString);
         if (levels == -1) {
             plugin.getLogger().warning("加载 " + id + " 时出错! 无效的花费: levels: " + levelsString);
         }
@@ -127,13 +136,13 @@ public class Config {
         String permission = config.getString(id + ".permission");
 
         String requiredAmountString = config.getString(id + ".required-amount");
-        int requiredAmount = Utils.parseInt(requiredAmountString);
+        int requiredAmount = requiredAmountString == null ? 0 : Utils.parseInt(requiredAmountString);
         if (requiredAmount == -1) {
             plugin.getLogger().warning("加载 " + id + " 时出错! 无效的需求数量: required-amount: " + requiredAmountString);
         }
 
         String cooldownString = config.getString(id + ".cooldown");
-        int cooldown = Utils.parseInt(cooldownString);
+        int cooldown = cooldownString == null ? 0 : Utils.parseInt(cooldownString);
         if (cooldown == -1) {
             plugin.getLogger().warning("加载 " + id + " 时出错! 无效的冷却时间: cooldown: " + cooldownString);
         }

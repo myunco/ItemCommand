@@ -40,9 +40,4 @@ public class Utils {
         return index == -1 ? "" : text.substring(index + 1);
     }
 
-    public static void main(String[] args) {
-        System.out.println(getTextLeft("test:oops", ':'));
-        System.out.println(getTextRight("test:oops", ':'));
-    }
-
 }

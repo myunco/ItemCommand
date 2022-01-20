@@ -9,9 +9,17 @@ softdepend:
   - PlaceholderAPI
 commands:
   itemcommand:
-    usage: /ItemCommand <add|list|reload|version>
+    usage: /ItemCommand <add|give|list|reload|version>
     aliases: ic
-    permission: itemcommand.admin
+    permission: itemcommand.use
 permissions:
+  itemcommand.use:
+    default: op
   itemcommand.admin:
+    children:
+      itemcommand.add: true
+      itemcommand.give: true
+      itemcommand.list: true
+      itemcommand.reload: true
+      itemcommand.version: true
     default: op

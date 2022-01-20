@@ -3,9 +3,11 @@ package ml.mcos.itemcommand;
 import me.clip.placeholderapi.PlaceholderAPI;
 import ml.mcos.itemcommand.config.Config;
 import ml.mcos.itemcommand.item.Item;
+import ml.mcos.itemcommand.util.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -20,6 +22,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
+import java.util.List;
 
 //1.0.0版本需求：实现配置文件中演示的所有功能
 public class ItemCommand extends JavaPlugin implements Listener {
@@ -77,40 +80,13 @@ public class ItemCommand extends JavaPlugin implements Listener {
         }
         switch (args[0].toLowerCase()) {
             case "add":
-                if (sender instanceof Player) {
-                    ItemStack item = ((Player) sender).getInventory().getItemInMainHand();
-                    boolean def = args.length == 1;
-                    boolean flag = false;
-                    ItemMeta meta = item.getItemMeta();
-                    String id = String.valueOf(System.currentTimeMillis());
-                    if (def || containsIgnoreCase(args, "name")) {
-                        if (meta == null || !meta.hasDisplayName()) {
-                            sender.sendMessage("§a你手中的物品没有显示名称，无法添加name项。");
-                        } else {
-                            Config.config.set(id + ".name", meta.getDisplayName());
-                            flag = true;
-                        }
-                    }
-                    if (!def && containsIgnoreCase(args, "lore")) {
-                        if (meta == null || !meta.hasLore()) {
-                            sender.sendMessage("§a你手中的物品没有Lore，无法添加lore项。");
-                        } else {
-                            Config.config.set(id + ".lore", meta.getLore());
-                            flag = true;
-                        }
-                    }
-                    if (!def && containsIgnoreCase(args, "type")) {
-                        Config.config.set(id + ".type", item.getType().toString());
-                        flag = true;
-
-                    }
-                    if (flag) {
-                        Config.saveConfig();
-                        sender.sendMessage("§a已添加到配置文件, ID为: " + id + ", 快去修改吧!");
-                    }
-                } else {
-                    sender.sendMessage("§a控制台无法使用此命令。");
-                }
+                commandAdd(sender, args);
+                break;
+            case "give":
+                commandGive(sender, args);
+                break;
+            case "list":
+                commandList(sender);
                 break;
             case "reload":
                 initConfig();
@@ -125,6 +101,95 @@ public class ItemCommand extends JavaPlugin implements Listener {
         return true;
     }
 
+    private void commandAdd(CommandSender sender, String[] args) {
+        if (sender instanceof Player) {
+            ItemStack item = ((Player) sender).getInventory().getItemInMainHand();
+            boolean def = args.length == 1;
+            boolean flag = false;
+            ItemMeta meta = item.getItemMeta();
+            String id = String.valueOf(System.currentTimeMillis());
+            if (def || containsIgnoreCase(args, "name")) {
+                if (meta == null || !meta.hasDisplayName()) {
+                    sender.sendMessage("§a你手中的物品没有显示名称，无法添加name项。");
+                } else {
+                    Config.config.set(id + ".name", meta.getDisplayName());
+                    flag = true;
+                }
+            }
+            if (!def && containsIgnoreCase(args, "lore")) {
+                if (meta == null || !meta.hasLore()) {
+                    sender.sendMessage("§a你手中的物品没有Lore，无法添加lore项。");
+                } else {
+                    Config.config.set(id + ".lore", meta.getLore());
+                    flag = true;
+                }
+            }
+            if (!def && containsIgnoreCase(args, "type")) {
+                Config.config.set(id + ".type", item.getType().toString());
+                flag = true;
+
+            }
+            if (flag) {
+                Config.saveConfig();
+                sender.sendMessage("§a已添加到配置文件, ID为: " + id + ", 快去修改吧!");
+            }
+            return;
+        }
+        sender.sendMessage("§a控制台无法使用此命令。");
+    }
+
+    private void commandGive(CommandSender sender, String[] args) {
+        if (args.length < 4) {
+            sender.sendMessage("用法: /ic give <玩家> <物品ID> <物品数量> [物品类型]");
+            sender.sendMessage("(物品类型参数仅在指定ID的物品配置中未指定物品类型时生效, 默认为石头)");
+            sender.sendMessage("<> = 必选参数 [] = 可选参数");
+            return;
+        }
+        Player player = getServer().getPlayer(args[1]);
+        if (player == null) {
+            sender.sendMessage("§c指定的玩家不在线或不存在!");
+        } else if (!Config.idList.contains(args[2])) {
+            sender.sendMessage("§c指定的ID不存在或未能正确加载.");
+        } else {
+            int amount = Utils.parseInt(args[3]);
+            if (amount < 1) {
+                sender.sendMessage("§c错误: 物品数量不能小于1!");
+                return;
+            }
+            String name = Config.config.getString(args[2] + ".name");
+            List<String> lore = Config.config.getStringList(args[2] + ".lore");
+            String typeString = Config.config.getString(args[2] + ".type");
+            if (typeString == null) {
+                typeString = args.length == 4 ? "STONE" : args[4];
+            }
+            Material type;
+            try {
+                type = Material.valueOf(typeString);
+            } catch (IllegalArgumentException e) {
+                sender.sendMessage("§c无效的物品类型: " + typeString);
+                return;
+            }
+            ItemStack item = new ItemStack(type, amount);
+            if (name != null || !lore.isEmpty()) {
+                ItemMeta meta = item.getItemMeta();
+                assert meta != null;
+                if (name != null) {
+                    meta.setDisplayName(name);
+                }
+                if (!lore.isEmpty()) {
+                    meta.setLore(lore);
+                }
+                item.setItemMeta(meta);
+            }
+            player.getInventory().addItem(item);
+            sender.sendMessage("§a已将§b" + amount + "§a个" + (name == null ? typeString : name) + "§a添加到该玩家的物品栏.");
+        }
+    }
+
+    private void commandList(CommandSender sender) {
+        sender.sendMessage("§6已加载的物品ID列表: §a" + String.join(", ", Config.idList));
+    }
+
     private boolean containsIgnoreCase(String[] array, String ele) {
         for (String s : array) {
             if (s.equalsIgnoreCase(ele)) {
@@ -137,7 +202,7 @@ public class ItemCommand extends JavaPlugin implements Listener {
     @EventHandler
     public void playerInteractEvent(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.HAND && event.hasItem()) {
-            if ((event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)) {
+            if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 ItemStack itemStack = event.getItem();
                 Item item = Config.matchItem(itemStack);
                 if (item != null) {
@@ -161,6 +226,7 @@ public class ItemCommand extends JavaPlugin implements Listener {
                         }
                         item.executeAction(player);
                     }
+                    event.setCancelled(true);
                 }
             }
         }
@@ -172,11 +238,13 @@ public class ItemCommand extends JavaPlugin implements Listener {
             return false;
         }
         long current = System.currentTimeMillis();
+        getLogger().info("time: " + time);
+        getLogger().info("current: " + current);
         if (time >= current) {
             player.sendMessage("§4使用冷却: §c" + (int) ((time - current) / 1000) + "§4秒。");
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public String replacePlaceholders(Player player, String text) {
