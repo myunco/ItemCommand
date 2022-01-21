@@ -8,7 +8,7 @@ softdepend:
   - PlayerPoints
   - PlaceholderAPI
 commands:
-  itemcommand:
+  ItemCommand:
     usage: /ItemCommand <add|give|list|reload|version>
     aliases: ic
     permission: itemcommand.admin

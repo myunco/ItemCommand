@@ -16,9 +16,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
-//1.0.0版本需求：实现配置文件中演示的所有功能
 public class ItemCommand extends JavaPlugin {
     private static ItemCommand plugin;
     private Economy economy;
@@ -100,6 +100,40 @@ public class ItemCommand extends JavaPlugin {
                 sender.sendMessage("§6未知的子命令");
         }
         return true;
+    }
+
+    @Override
+    @SuppressWarnings("NullableProblems")
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (sender instanceof Player) {
+            if (args.length > 1 && args[0].equalsIgnoreCase("add")) {
+                ArrayList<String> list = new ArrayList<>(TabComplete.tabListMap.get("ItemCommand.add"));
+                list.removeAll(mergeArgs(args));
+                return list.isEmpty() ? list : TabComplete.getCompleteList(args, list);
+            }
+            if (args[0].equalsIgnoreCase("give")) {
+                switch (args.length) {
+                    case 3:
+                        return TabComplete.getCompleteList(args, Config.idList, true);
+                    case 4:
+                        return TabComplete.getCompleteList(args, TabComplete.amountList);
+                    case 5:
+                        return TabComplete.getCompleteList(args, TabComplete.typeList, true);
+                }
+            }
+        }
+        return TabComplete.getCompleteList(args, TabComplete.getTabList(args, command.getName()));
+    }
+
+    private static ArrayList<String> mergeArgs(String[] args) {
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 1; i < args.length; i++) {
+            if (args[i].isEmpty()) {
+                continue;
+            }
+            list.add(args[i]);
+        }
+        return list;
     }
 
     private void commandAdd(CommandSender sender, String[] args) {
@@ -197,12 +231,9 @@ public class ItemCommand extends JavaPlugin {
     }
 
     public String replacePlaceholders(Player player, String text) {
-        getLogger().info("text = " + text);
         if (enablePAPI && possibleContainPlaceholders(text)) {
-            getLogger().info("可能包含PAPI占位符");
             return PlaceholderAPI.setPlaceholders(player, text.indexOf('{') == -1 ? text : text.replace("{player}", player.getName()));
         } else {
-            getLogger().info("没有包含PAPI占位符");
             return text.indexOf('{') == -1 ? text : text.replace("{player}", player.getName());
         }
     }
