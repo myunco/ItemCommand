@@ -1,6 +1,6 @@
 name: ItemCommand
 main: ml.mcos.itemcommand.ItemCommand
-version: 1.0.0-BETA
+version: 1.0.0-SNAPSHOT
 api-version: 1.13
 author: myunco
 softdepend:
@@ -11,15 +11,7 @@ commands:
   itemcommand:
     usage: /ItemCommand <add|give|list|reload|version>
     aliases: ic
-    permission: itemcommand.use
+    permission: itemcommand.admin
 permissions:
-  itemcommand.use:
-    default: op
   itemcommand.admin:
-    children:
-      itemcommand.add: true
-      itemcommand.give: true
-      itemcommand.list: true
-      itemcommand.reload: true
-      itemcommand.version: true
     default: op

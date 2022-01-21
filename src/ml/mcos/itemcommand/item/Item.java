@@ -40,14 +40,14 @@ public class Item {
     }
 
     public boolean match(ItemStack item) {
+        if (type != null && type != item.getType()) {
+            return false;
+        }
         ItemMeta meta = item.getItemMeta();
         if (name != null && (meta == null || !name.equals(meta.getDisplayName()))) {
             return false;
         }
-        if (!lore.isEmpty() && (meta == null || !lore.equals(meta.getLore()))) {
-            return false;
-        }
-        return type == null || type == item.getType();
+        return lore.isEmpty() || (meta != null && meta.hasLore() && lore.equals(meta.getLore()));
     }
 
     public void executeAction(Player player) {
@@ -57,22 +57,30 @@ public class Item {
     }
 
     public boolean charge(Player player) {
-        if (price > 0.0 && !economy.has(player, price)) {
-            player.sendMessage("§c你没有足够的金钱来使用此物品。");
-            return false;
-        }
-        if (points > 0 && pointsAPI.look(player.getUniqueId()) < points) {
-            player.sendMessage("§c你没有足够的点券来使用此物品。");
-            return false;
-        }
-        if (levels > 0 && player.getLevel() < levels) {
-            player.sendMessage("§c你没有足够的等级来使用此物品。");
-            return false;
-        }
         if (price > 0.0) {
-            economy.withdrawPlayer(player, price);
+            if (economy == null) {
+                player.sendMessage("§c错误: 未找到经济插件，无法扣除余额。");
+            } else if (!economy.has(player, price)) {
+                player.sendMessage("§c你没有足够的金钱(" + price + ")使用此物品。");
+                return false;
+            }
         }
         if (points > 0) {
+            if (pointsAPI == null) {
+                player.sendMessage("§c错误: 未找到点券插件，无法扣除点券。");
+            } else if (pointsAPI.look(player.getUniqueId()) < points) {
+                player.sendMessage("§c你没有足够的点券(" + points + ")使用此物品。");
+                return false;
+            }
+        }
+        if (levels > 0 && player.getLevel() < levels) {
+            player.sendMessage("§c你没有足够的等级(" + levels + ")使用此物品。");
+            return false;
+        }
+        if (price > 0.0 && economy != null) {
+            economy.withdrawPlayer(player, price);
+        }
+        if (points > 0 && pointsAPI != null) {
             pointsAPI.take(player.getUniqueId(), points);
         }
         if (levels > 0) {
@@ -82,8 +90,7 @@ public class Item {
     }
 
     public boolean hasPermission(Player player) {
-        //return permission == null || player.hasPermission(permission);
-        if (permission == null || player.hasPermission(permission)) {
+        if (permission == null || permission.isEmpty() || player.hasPermission(permission)) {
             return true;
         }
         player.sendMessage("§c你没有权限使用此物品。");
@@ -94,15 +101,15 @@ public class Item {
         return requiredAmount;
     }
 
-    public boolean meetRequiredAmount(Player player, ItemStack item) {
+    public boolean hasEnoughAmount(Player player, ItemStack item) {
         if (item.getAmount() >= requiredAmount) {
             return true;
         }
-        if (requiredAmount > 0 && player.getInventory().containsAtLeast(item, requiredAmount)) {
-            player.sendMessage("§c你没有足够数量的物品用来使用。");
-            return false;
+        if (requiredAmount < 1 || player.getInventory().containsAtLeast(item, requiredAmount)) {
+            return true;
         }
-        return true;
+        player.sendMessage("§c你没有足够数量的物品可以使用。");
+        return false;
     }
 
     public int getCooldown() {

@@ -40,8 +40,6 @@ public class Config {
         config = loadConfiguration(configFile);
         if (!items.isEmpty()) {
             items.clear();
-        }
-        if (!idList.isEmpty()) {
             idList.clear();
         }
         for (String id : config.getKeys(false)) {
@@ -81,7 +79,7 @@ public class Config {
                 action[i] = new CommandAction(actionString);
             } else {
                 String actionValue = Utils.getTextRight(actionString, ':').trim();
-                switch (actionType) {
+                switch (actionType.toLowerCase()) {
                     case "cmd":
                         action[i] = new CommandAction(actionValue);
                         break;

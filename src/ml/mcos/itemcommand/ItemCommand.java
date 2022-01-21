@@ -2,7 +2,7 @@ package ml.mcos.itemcommand;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import ml.mcos.itemcommand.config.Config;
-import ml.mcos.itemcommand.item.Item;
+import ml.mcos.itemcommand.listener.PlayerInteractEventListener;
 import ml.mcos.itemcommand.util.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
@@ -11,44 +11,45 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
 import java.util.List;
 
 //1.0.0版本需求：实现配置文件中演示的所有功能
-public class ItemCommand extends JavaPlugin implements Listener {
+public class ItemCommand extends JavaPlugin {
     private static ItemCommand plugin;
     private Economy economy;
     private PlayerPointsAPI pointsAPI;
     private boolean enablePAPI;
-    private final HashMap<String, Long> cdMap = new HashMap<>();
 
     @Override
     public void onEnable() {
         plugin = this;
-        setupEconomy();
-        setupPointsAPI();
-        enablePAPI = getServer().getPluginManager().getPlugin("PlaceholderAPI") != null;
-        initConfig();
-        getServer().getPluginManager().registerEvents(this, this);
-    }
-
-    private void initConfig() {
-        Config.loadConfig(this);
+        init();
+        getServer().getPluginManager().registerEvents(new PlayerInteractEventListener(), this);
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
+    }
+
+    public static ItemCommand getPlugin() {
+        return plugin;
+    }
+
+    private void init() {
+        if (economy == null) {
+            setupEconomy();
+        }
+        if (pointsAPI == null) {
+            setupPointsAPI();
+        }
+        enablePAPI = getServer().getPluginManager().isPluginEnabled("PlaceholderAPI");
+        Config.loadConfig(this);
     }
 
     public void setupEconomy() {
@@ -86,10 +87,10 @@ public class ItemCommand extends JavaPlugin implements Listener {
                 commandGive(sender, args);
                 break;
             case "list":
-                commandList(sender);
+                sender.sendMessage("§6已加载的物品ID列表: §a" + String.join(", ", Config.idList));
                 break;
             case "reload":
-                initConfig();
+                init();
                 sender.sendMessage("§a配置文件重载完成");
                 break;
             case "version":
@@ -186,10 +187,6 @@ public class ItemCommand extends JavaPlugin implements Listener {
         }
     }
 
-    private void commandList(CommandSender sender) {
-        sender.sendMessage("§6已加载的物品ID列表: §a" + String.join(", ", Config.idList));
-    }
-
     private boolean containsIgnoreCase(String[] array, String ele) {
         for (String s : array) {
             if (s.equalsIgnoreCase(ele)) {
@@ -199,58 +196,13 @@ public class ItemCommand extends JavaPlugin implements Listener {
         return false;
     }
 
-    @EventHandler
-    public void playerInteractEvent(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.hasItem()) {
-            if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                ItemStack itemStack = event.getItem();
-                Item item = Config.matchItem(itemStack);
-                if (item != null) {
-                    Player player = event.getPlayer();
-                    //noinspection ConstantConditions
-                    if (item.hasPermission(player) && item.meetRequiredAmount(player, itemStack) && !isCooling(player) && item.charge(player)) {
-                        if (item.getCooldown() > 0) {
-                            cdMap.put(player.getName(), System.currentTimeMillis() + item.getCooldown() * 1000L);
-                        }
-                        int requiredAmount = item.getRequiredAmount();
-                        if (requiredAmount > 0) {
-                            if (itemStack.getAmount() > requiredAmount) {
-                                itemStack.setAmount(itemStack.getAmount() - requiredAmount);
-                            } else if (itemStack.getAmount() == requiredAmount) {
-                                player.getInventory().setItemInMainHand(null);
-                            } else {
-                                ItemStack stack = itemStack.clone();
-                                stack.setAmount(requiredAmount);
-                                player.getInventory().removeItem(stack);
-                            }
-                        }
-                        item.executeAction(player);
-                    }
-                    event.setCancelled(true);
-                }
-            }
-        }
-    }
-
-    private boolean isCooling(Player player) {
-        Long time = cdMap.get(player.getName());
-        if (time == null) {
-            return false;
-        }
-        long current = System.currentTimeMillis();
-        getLogger().info("time: " + time);
-        getLogger().info("current: " + current);
-        if (time >= current) {
-            player.sendMessage("§4使用冷却: §c" + (int) ((time - current) / 1000) + "§4秒。");
-            return true;
-        }
-        return false;
-    }
-
     public String replacePlaceholders(Player player, String text) {
+        getLogger().info("text = " + text);
         if (enablePAPI && possibleContainPlaceholders(text)) {
+            getLogger().info("可能包含PAPI占位符");
             return PlaceholderAPI.setPlaceholders(player, text.indexOf('{') == -1 ? text : text.replace("{player}", player.getName()));
         } else {
+            getLogger().info("没有包含PAPI占位符");
             return text.indexOf('{') == -1 ? text : text.replace("{player}", player.getName());
         }
     }
@@ -267,10 +219,6 @@ public class ItemCommand extends JavaPlugin implements Listener {
             }
         }
         return false;
-    }
-
-    public static ItemCommand getPlugin() {
-        return plugin;
     }
 
     public Economy getEconomy() {

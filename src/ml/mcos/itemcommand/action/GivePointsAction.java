@@ -11,7 +11,7 @@ public class GivePointsAction extends Action {
 
     @Override
     public void execute(Player player) {
-        if (plugin.getEconomy() == null) {
+        if (plugin.getPointsAPI() == null) {
             plugin.getLogger().warning("未找到点券插件, 无法执行 give-points 动作!");
             plugin.getLogger().warning("请检查是否正确安装PlayerPoints插件!");
         } else {
