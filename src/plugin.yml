@@ -9,9 +9,10 @@ softdepend:
   - PlaceholderAPI
 commands:
   ItemCommand:
-    usage: /ItemCommand <add|give|list|reload|version>
+    usage: '§6用法: /ItemCommand §e<§6add§7|§6give§7|§6list§7|§6reload§7|§6version§e>'
     aliases: ic
     permission: itemcommand.admin
+    permission-message: You don''t have permission!
 permissions:
   itemcommand.admin:
     default: op

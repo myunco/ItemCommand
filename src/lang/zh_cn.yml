@@ -1,0 +1,16 @@
+#语言文件版本号 请勿修改
+version: 1
+
+log-prefix: '[ItemCommand] '
+message-prefix: '§8[§3ItemCommand§8] '
+language-version-error: '语言文件版本错误: '
+language-version-outdated: '§e当前语言文件版本：§a{0} §c最新版本：§b{1} §6需要更新.'
+language-update-complete: '§a语言文件更新完成!'
+config-version-error: '配置文件版本错误: '
+config-version-outdated: '§e当前配置文件版本：§a{0} §c最新版本：§b{1} §6需要更新.'
+config-update-complete: '§a配置文件更新完成!'
+update-found-new-version: '§c发现新版本可用! §b当前版本: {0} §d最新版本: {1}'
+update-major-update: '§e(有大更新)'
+update-download-link: '§a下载地址: '
+update-check-failure: '§e检查更新失败, 状态码: '
+update-check-exception: '§4检查更新时发生IO异常.'

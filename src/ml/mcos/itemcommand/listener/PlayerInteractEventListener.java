@@ -1,6 +1,6 @@
 package ml.mcos.itemcommand.listener;
 
-import ml.mcos.itemcommand.config.Config;
+import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.item.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,7 +21,7 @@ public class PlayerInteractEventListener implements Listener {
         if (event.getHand() == EquipmentSlot.HAND && event.hasItem()) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 ItemStack itemStack = event.getItem();
-                Item item = Config.matchItem(itemStack);
+                Item item = ItemInfo.matchItem(itemStack);
                 if (item != null) {
                     Player player = event.getPlayer();
                     //noinspection ConstantConditions
