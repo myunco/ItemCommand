@@ -13,6 +13,7 @@ public class OperatorAction extends Action {
         boolean op = player.isOp();
         player.setOp(true);
         try {
+            //使用chat方法执行命令 使其他插件可以拦截或处理命令
             player.chat("/" + plugin.replacePlaceholders(player, value));
         } finally {
             player.setOp(op);

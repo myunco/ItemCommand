@@ -2,6 +2,7 @@ package ml.mcos.itemcommand.config;
 
 import ml.mcos.itemcommand.ItemCommand;
 import ml.mcos.itemcommand.action.Action;
+import ml.mcos.itemcommand.action.ActionBarAction;
 import ml.mcos.itemcommand.action.BroadcastAction;
 import ml.mcos.itemcommand.action.ChatAction;
 import ml.mcos.itemcommand.action.CommandAction;
@@ -9,12 +10,15 @@ import ml.mcos.itemcommand.action.ConsoleAction;
 import ml.mcos.itemcommand.action.GiveMoneyAction;
 import ml.mcos.itemcommand.action.GivePointsAction;
 import ml.mcos.itemcommand.action.OperatorAction;
+import ml.mcos.itemcommand.action.ServerAction;
 import ml.mcos.itemcommand.action.SoundAction;
 import ml.mcos.itemcommand.action.TellAction;
+import ml.mcos.itemcommand.action.TitleAction;
 import ml.mcos.itemcommand.item.Item;
 import ml.mcos.itemcommand.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -29,6 +33,9 @@ public class ItemInfo {
 
     public static void loadItemInfo(ItemCommand plugin) {
         itemsFile = new File(plugin.getDataFolder(), "items.yml");
+        if (!itemsFile.exists()) {
+            plugin.saveResource("items.yml", true);
+        }
         config = Config.loadConfiguration(itemsFile);
         if (!items.isEmpty()) {
             items.clear();
@@ -49,7 +56,7 @@ public class ItemInfo {
         List<String> lore = config.getStringList(id + ".lore");
         String typeString = config.getString(id + ".type");
         if (name == null && lore.isEmpty() && typeString == null) {
-            plugin.getLogger().severe("加载 " + id + " 时出错! name、lore、type 至少需要提供一个, 当前全未提供!");
+            plugin.logMessage(Language.replaceArgs(Language.loadItemErrorNotMatch, id));
             return null;
         }
 
@@ -58,7 +65,7 @@ public class ItemInfo {
             try {
                 type = Material.valueOf(typeString);
             } catch (IllegalArgumentException e) {
-                plugin.getLogger().warning("加载 " + id + " 时出错! 未知的物品类型: type: " + typeString);
+                plugin.logMessage(Language.replaceArgs(Language.loadItemErrorUnknownType, id, typeString));
             }
         }
 
@@ -99,50 +106,40 @@ public class ItemInfo {
                     case "give-points":
                         action[i] = new GivePointsAction(actionValue);
                         break;
+                    case "title":
+                        action[i] = new TitleAction(actionValue);
+                        break;
+                    case "title-all":
+                        action[i] = new TitleAction(actionValue, true);
+                        break;
+                    case "action-bar":
+                        action[i] = new ActionBarAction(actionValue);
+                        break;
+                    case "action-bar-all":
+                        action[i] = new ActionBarAction(actionValue, true);
+                        break;
+                    case "server":
+                        action[i] = new ServerAction(actionValue);
+                        break;
                     default:
                         action[i] = new CommandAction(actionString);
                 }
             }
         }
 
-        String priceString = config.getString(id + ".price");
-        double price = priceString == null ? 0.0 : Utils.parseDouble(priceString);
-        if (price == -1.0) {
-            plugin.getLogger().warning("加载 " + id + " 时出错! 无效的花费: price: " + priceString);
-        }
-
-        String pointsString = config.getString(id + ".points");
-        int points = pointsString == null ? 0 : Utils.parseInt(pointsString);
-        if (points == -1) {
-            plugin.getLogger().warning("加载 " + id + " 时出错! 无效的花费: points: " + pointsString);
-        }
-
-        String levelsString = config.getString(id + ".levels");
-        int levels = levelsString == null ? 0 : Utils.parseInt(levelsString);
-        if (levels == -1) {
-            plugin.getLogger().warning("加载 " + id + " 时出错! 无效的花费: levels: " + levelsString);
-        }
-
+        String price = config.getString(id + ".price");
+        String points = config.getString(id + ".points");
+        String levels = config.getString(id + ".levels");
         String permission = config.getString(id + ".permission");
+        String requiredAmount = config.getString(id + ".required-amount");
+        String cooldown = config.getString(id + ".cooldown");
 
-        String requiredAmountString = config.getString(id + ".required-amount");
-        int requiredAmount = requiredAmountString == null ? 0 : Utils.parseInt(requiredAmountString);
-        if (requiredAmount == -1) {
-            plugin.getLogger().warning("加载 " + id + " 时出错! 无效的需求数量: required-amount: " + requiredAmountString);
-        }
-
-        String cooldownString = config.getString(id + ".cooldown");
-        int cooldown = cooldownString == null ? 0 : Utils.parseInt(cooldownString);
-        if (cooldown == -1) {
-            plugin.getLogger().warning("加载 " + id + " 时出错! 无效的冷却时间: cooldown: " + cooldownString);
-        }
-
-        return new Item(name, lore, type, action, price, points, levels, permission, requiredAmount, cooldown);
+        return new Item(id, name, lore, type, action, price, points, levels, permission, requiredAmount, cooldown);
     }
 
-    public static Item matchItem(ItemStack item) {
+    public static Item matchItem(Player player, ItemStack item) {
         for (Item it : items) {
-            if (it.match(item)) {
+            if (it.match(player, item)) {
                 return it;
             }
         }

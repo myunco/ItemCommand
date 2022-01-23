@@ -28,7 +28,7 @@ public class UpdateChecker {
                         if (result.hasNewVersion()) {
                             String str = Language.replaceArgs(Language.updateFoundNewVersion, currentVersion, result.getLatestVersion());
                             plugin.logMessage(result.hasMajorUpdate() ? Language.updateMajorUpdate + str : str);
-                            plugin.logMessage(Language.updateDownloadLink + "xxx");
+                            plugin.logMessage(Language.updateDownloadLink + "https://github.com/myunco/ItemCommand");
                         }
                     } else {
                         plugin.logMessage(Language.updateCheckFailure + result.getResponseCode());

@@ -7,11 +7,13 @@ import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.listener.PlayerInteractEventListener;
 import ml.mcos.itemcommand.metrics.Metrics;
+import ml.mcos.itemcommand.update.UpdateChecker;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,9 +22,12 @@ public class ItemCommand extends JavaPlugin {
     private Economy economy;
     private PlayerPoints points;
     private boolean enablePAPI;
+    private String papiVersion;
 
     @Override
     public void onEnable() {
+        //TODO
+        //支持使用条件 支持手持触发 左键点击触发
         plugin = this;
         init();
         getServer().getPluginManager().registerEvents(new PlayerInteractEventListener(), this);
@@ -33,23 +38,32 @@ public class ItemCommand extends JavaPlugin {
         Metrics metrics = new Metrics(this, 14020);
         metrics.addCustomChart(new Metrics.SimplePie("economy_plugin", () -> economy == null ? "Not found" : economy.getName()));
         metrics.addCustomChart(new Metrics.SimplePie("playerpoints_version", () -> points == null ? "Not found" : points.getDescription().getVersion()));
+        metrics.addCustomChart(new Metrics.SimplePie("placeholderapi_version", () -> papiVersion == null ? "Not found" : papiVersion));
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        UpdateChecker.stop();
     }
 
     public void init() {
+        Config.loadConfig(this);
+        ItemInfo.loadItemInfo(this);
+        if (Config.checkUpdate) {
+            UpdateChecker.start();
+        }
         if (economy == null) {
             setupEconomy();
         }
         if (points == null) {
             setupPoints();
         }
-        enablePAPI = getServer().getPluginManager().isPluginEnabled("PlaceholderAPI");
-        Config.loadConfig(this);
-        ItemInfo.loadItemInfo(this);
+        Plugin papi = getServer().getPluginManager().getPlugin("PlaceholderAPI");
+        enablePAPI = papi != null && papi.isEnabled();
+        if (enablePAPI) {
+            papiVersion = papi.getDescription().getVersion();
+            logMessage("Found PlaceholderAPI: §3v" + papiVersion);
+        }
     }
 
     public static ItemCommand getPlugin() {
@@ -65,7 +79,7 @@ public class ItemCommand extends JavaPlugin {
             return;
         }
         economy = rsp.getProvider();
-        getLogger().info("Using economy system: §3" + economy.getName());
+        logMessage("Using economy system: §3" + economy.getName());
     }
 
     public void setupPoints() {
@@ -74,7 +88,7 @@ public class ItemCommand extends JavaPlugin {
             return;
         }
         points = playerPoints;
-        getLogger().info("Found PlayerPoints: §3v" + playerPoints.getDescription().getVersion());
+        logMessage("Found PlayerPoints: §3v" + playerPoints.getDescription().getVersion());
     }
 
     public Economy getEconomy() {
@@ -82,25 +96,27 @@ public class ItemCommand extends JavaPlugin {
     }
 
     public PlayerPointsAPI getPointsAPI() {
-        return points.getAPI();
+        return points == null ? null : points.getAPI();
     }
 
     public String replacePlaceholders(Player player, String text) {
+        if (text == null) {
+            return null;
+        }
         if (enablePAPI && mayContainPlaceholders(text)) {
             return PlaceholderAPI.setPlaceholders(player, text.indexOf('{') == -1 ? text : text.replace("{player}", player.getName()));
-        } else {
-            return text.indexOf('{') == -1 ? text : text.replace("{player}", player.getName());
         }
+        return text.indexOf('{') == -1 ? text : text.replace("{player}", player.getName());
     }
 
-    private static boolean mayContainPlaceholders(String text) {
+    public static boolean mayContainPlaceholders(String text) {
         char[] value = text.toCharArray();
         int count = 0;
         for (char c : value) {
             if (c == '%') {
                 count++;
                 if (count == 2) {
-                    return true;
+                    return text.indexOf('_') != -1;
                 }
             }
         }

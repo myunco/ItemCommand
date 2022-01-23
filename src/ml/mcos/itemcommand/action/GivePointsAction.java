@@ -1,5 +1,6 @@
 package ml.mcos.itemcommand.action;
 
+import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.util.Utils;
 import org.bukkit.entity.Player;
 
@@ -12,12 +13,12 @@ public class GivePointsAction extends Action {
     @Override
     public void execute(Player player) {
         if (plugin.getPointsAPI() == null) {
-            plugin.getLogger().warning("未找到点券插件, 无法执行 give-points 动作!");
-            plugin.getLogger().warning("请检查是否正确安装PlayerPoints插件!");
+            plugin.logMessage(Language.actionExecuteErrorGivePointsNotFoundPoints);
+            plugin.logMessage(Language.actionExecuteErrorGivePointsNotFoundPointsTip);
         } else {
             int points = Utils.parseInt(plugin.replacePlaceholders(player, value));
             if (points == -1) {
-                plugin.getLogger().warning("错误: 无法执行 give-points 动作! 原因: 无效的数字格式: " + value);
+                plugin.logMessage(Language.replaceArgs(Language.actionExecuteErrorGivePointsInvalidValue, value));
             } else if (points > 0) {
                 plugin.getPointsAPI().give(player.getUniqueId(), points);
             }

@@ -14,22 +14,23 @@ import org.bukkit.inventory.ItemStack;
 import java.util.HashMap;
 
 public class PlayerInteractEventListener implements Listener {
-    private static final HashMap<String, Long> cdMap = new HashMap<>();
+    private static final HashMap<String, HashMap<String, Long>> cdMap = new HashMap<>();
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.LOW)
     public void playerInteractEvent(PlayerInteractEvent event) {
         if (event.getHand() == EquipmentSlot.HAND && event.hasItem()) {
             if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                 ItemStack itemStack = event.getItem();
-                Item item = ItemInfo.matchItem(itemStack);
+                Player player = event.getPlayer();
+                Item item = ItemInfo.matchItem(player, itemStack);
                 if (item != null) {
-                    Player player = event.getPlayer();
                     //noinspection ConstantConditions
-                    if (item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player) && item.charge(player)) {
-                        if (item.getCooldown() > 0) {
-                            cdMap.put(player.getName(), System.currentTimeMillis() + item.getCooldown() * 1000L);
+                    if (item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player, item.getId()) && item.charge(player)) {
+                        int cooldown = item.getCooldown(player);
+                        if (cooldown > 0) {
+                            putCooldown(player.getName(), item.getId(), cooldown);
                         }
-                        int requiredAmount = item.getRequiredAmount();
+                        int requiredAmount = item.getRequiredAmount(player);
                         if (requiredAmount > 0) {
                             if (itemStack.getAmount() > requiredAmount) {
                                 itemStack.setAmount(itemStack.getAmount() - requiredAmount);
@@ -49,17 +50,25 @@ public class PlayerInteractEventListener implements Listener {
         }
     }
 
-    private static boolean isCooling(Player player) {
-        Long time = cdMap.get(player.getName());
+    private static void putCooldown(String player, String itemID, int cooldown) {
+        cdMap.computeIfAbsent(player, k -> new HashMap<>()).put(itemID, System.currentTimeMillis() + cooldown * 1000L);
+    }
+
+    private static boolean isCooling(Player player, String itemID) {
+        HashMap<String, Long> map = cdMap.get(player.getName());
+        if (map == null) {
+            return false;
+        }
+        Long time = map.get(itemID);
         if (time == null) {
             return false;
         }
         long current = System.currentTimeMillis();
-        if (time >= current) {
-            player.sendMessage("§4使用冷却: §c" + (int) ((time - current) / 1000) + "§4秒。");
-            return true;
+        if (time < current) {
+            return false;
         }
-        return false;
+        player.sendMessage("§4使用冷却: §c" + (int) ((time - current) / 1000) + "§4秒。");
+        return true;
     }
 
 }

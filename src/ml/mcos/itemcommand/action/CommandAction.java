@@ -10,6 +10,7 @@ public class CommandAction extends Action{
 
     @Override
     public void execute(Player player) {
+        //使用chat方法执行命令 使其他插件可以拦截或处理命令
         player.chat("/" + plugin.replacePlaceholders(player, value));
     }
 }

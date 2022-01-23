@@ -17,6 +17,14 @@ public class Config {
     public static String language;
     public static boolean checkUpdate;
 
+    public static void main(String[] args) {
+        YamlConfiguration test = loadConfiguration(new File("src/items.yml"));
+        System.out.println(test.getString("001.action-left"));
+        System.out.println(test.getStringList("001.action-left"));
+        System.out.println(test.getString("001.action-right"));
+        System.out.println(test.getStringList("001.action-right"));
+    }
+
     public static void loadConfig(ItemCommand plugin) {
         plugin.saveDefaultConfig();
         File configFile = new File(plugin.getDataFolder(), "config.yml");

@@ -1,17 +1,28 @@
-#ID 不要重复 内容随意 不要包含 . 和空格
+#物品ID 用英文单引号括起来 内容随意 不要重复 不要包含 . 和空格
 '001':
-  #匹配物品显示名 可选 没有此项则不限物品显示名
-  name: 'example'
-  #匹配物品Lore 可选 没有此项则不限物品Lore
+  #匹配物品显示名 可选 支持变量 没有此项则不限物品显示名
+  name: '§6example'
+  #匹配物品Lore 可选 支持变量 没有此项则不限物品Lore
   lore:
-    - 'example'
+    - '§3example'
   #匹配物品类型 可选 没有此项则不限物品类型 (虽然name,lore,type都是可选的,但至少要提供一个)
   type: 'PAPER'
-  #物品使用后执行的动作 一行一个动作 可选(虽然可选 但应该不会有人留空吧?使用物品后没有任何动作有啥用???)
-  #可选的动作有: cmd,op,console,tell,chat,sound,broadcast,give-money,give-points 不指定默认为cmd
-  action:
+  #使用物品需要满足的条件 一行一个条件 可选 支持变量 格式为 类型:表达式:不满足条件时显示的消息
+  #类型有三种: s = 字符串比较 i = 整数(int)比较 d = 小数(double)比较
+  #可使用的运算符 ==(等于) !=(不等于) >(大于) >=(大于等于) <(小于) <=(小于等于)
+  #什么是满足条件? 表达式运算后产生的结果如果为true 则满足条件 如果为false 则不满足条件
+  condition:
+    - 's:{player}!=notch:§c你的名字是notch 不能使用此物品!'
+  #手持物品左键使用后执行的动作 一行一个动作 没有此项表示此物品不能左键使用
+  #如果想引用右键的动作 可以直接写成 action-left: right
+  action-left: right
+  #手持物品右键使用后执行的动作 一行一个动作 没有此项表示此物品不能右键使用
+  #如果想引用左键的动作 可以直接写成 action-right: left (注意 左右键的动作不能互相引用)
+  action-right:
+    #可选的动作有: cmd, op, console, tell, chat, sound, broadcast, give-money, give-points,
+    #  title, title-all, action-bar, action-bar-all, server 不指定默认为cmd
     #格式为 动作: 值
-    #动作后面紧跟一个英文冒号 否则无法识别出正确动作会默认为是cmd动作
+    #动作后面紧跟一个英文冒号 否则无法识别出正确动作会默认为整行都是cmd动作的值
     #cmd = 让使用物品的玩家执行的命令 命令不需要加 /
     - 'cmd: help'
     #op = 让使用物品的玩家以op身份执行的命令 同样不需要加 /
@@ -30,17 +41,27 @@
     - 'give-money: 10'
     #give-points = 给予使用物品的玩家指定数量的点券 只能为正整数 使用此功能需要安装PlayerPoints插件
     - 'give-points: 10'
-  #使用物品需要花费的钱 可选 不能为负数
+    #title = 给使用物品的玩家发送Title消息 格式 标题,副标题,显示时间(秒) 注意 逗号为英文逗号 1.10及以下版本不支持此动作
+    - 'title: HiHiHi,没人看得到我 因为会被覆盖,10'
+    #title-all = 给全服玩家发送Title消息 格式同上 注意 新的Title会覆盖没显示完的Title 所以这条Title会覆盖掉上面那一条
+    - 'title-all: Hi,{player},10'
+    #action-bar = 给使用物品的玩家发送ActionBar消息 使用此动作需要使用Spigot或其衍生服务端 如Paper
+    - 'action-bar: hi 没人看得到我'
+    #action-bar-all = 给全服玩家发送ActionBar消息 注意 新的ActionBar会覆盖没显示完的ActionBar 所以这条ActionBar会覆盖掉上面那一条
+    - 'action-bar-all: hi {player}'
+    #server = 让使用物品的玩家切换到指定的BC子服 如果你不知道这是什么 那么你不需要此功能
+    - 'server: login'
+  #使用物品需要花费的钱 可选 支持变量 不能为负数
   price: 10
-  #使用物品需要花费的点券 可选 不能为负数
+  #使用物品需要花费的点券 可选 支持变量 不能为负数
   points: 10
-  #使用物品需要花费的经验等级 可选 不能为负数
+  #使用物品需要花费的经验等级 可选 支持变量 不能为负数
   levels: 10
-  #使用物品需要的权限 可选
+  #使用物品需要的权限 可选 支持变量
   permission: 'example'
-  #使用物品会消耗的数量 可选 不能为负数 物品数量不足不能使用 提供0或没有此项则不消耗物品
+  #使用物品会消耗的数量 可选 支持变量 不能为负数 物品数量不足不能使用 提供0或没有此项则不消耗物品
   required-amount: 1
-  #冷却时间 单位秒 可选 不能为负数 如果设置了冷却时间 表示使用物品后必须等待指定的时间后才能再次使用物品(冷却期间其他物品也不能使用)
+  #冷却时间 单位秒 可选 支持变量 不能为负数 如果设置了冷却时间 表示使用此物品后必须等待指定的时间后才能再次使用此物品(冷却时间每个物品ID单独计算)
   cooldown: 10
 
 #一个简单的匹配物品显示名的例子：
@@ -50,6 +71,7 @@
   action:
     - 'give-money: 100'
     - 'tell: §b你使用了一张§6银票§b, 获得了100银币.'
+    - 'sound: ENTITY_EXPERIENCE_ORB_PICKUP'
   required-amount: 1
 
 #一个匹配物品显示名和物品类型的例子：
@@ -62,6 +84,7 @@
   action:
     - 'give-money: 1000'
     - 'tell: §b你使用了一张§6真·银票§b, 获得了1000银币.'
+    - 'sound: ENTITY_EXPERIENCE_ORB_PICKUP'
   required-amount: 1
 
 #一个匹配物品显示名和Lore以及物品类型的例子：
