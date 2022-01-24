@@ -4,6 +4,7 @@ import ml.mcos.itemcommand.ItemCommand;
 import ml.mcos.itemcommand.TabComplete;
 import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.config.Language;
+import ml.mcos.itemcommand.update.UpdateChecker;
 import ml.mcos.itemcommand.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -40,7 +41,7 @@ public class ICCommand implements TabExecutor {
                 sendMessage(sender, "§6已加载的物品ID列表: §a" + String.join(", ", ItemInfo.idList));
                 break;
             case "reload":
-                plugin.onDisable();
+                UpdateChecker.stop();
                 plugin.init();
                 sendMessage(sender, "§a配置文件重载完成");
                 break;

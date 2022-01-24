@@ -22,6 +22,7 @@ public class Item {
     private final String name;
     private final List<String> lore;
     private final Material type;
+    private Trigger[] trigger;
     private final Action[] action;
     private final String price;
     private final String points;

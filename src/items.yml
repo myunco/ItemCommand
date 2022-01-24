@@ -13,12 +13,11 @@
   #什么是满足条件? 表达式运算后产生的结果如果为true 则满足条件 如果为false 则不满足条件
   condition:
     - 's:{player}!=notch:§c你的名字是notch 不能使用此物品!'
-  #手持物品左键使用后执行的动作 一行一个动作 没有此项表示此物品不能左键使用
-  #如果想引用右键的动作 可以直接写成 action-left: right
-  action-left: right
-  #手持物品右键使用后执行的动作 一行一个动作 没有此项表示此物品不能右键使用
-  #如果想引用左键的动作 可以直接写成 action-right: left (注意 左右键的动作不能互相引用)
-  action-right:
+  #触发方式 可同时选择多种触发方式 用英文逗号分隔 可选 默认为right
+  #支持的触发方式有: left(左键点击), right(右键点击), held(手持时), inv_left(物品栏内左键点击), inv_right(物品栏内右键点击)
+  trigger: left,right
+  #物品使用后执行的动作 一行一个动作 支持变量 可选 没有此项则不执行任何动作
+  action:
     #可选的动作有: cmd, op, console, tell, chat, sound, broadcast, give-money, give-points,
     #  title, title-all, action-bar, action-bar-all, server 不指定默认为cmd
     #格式为 动作: 值
@@ -76,7 +75,7 @@
 
 #一个匹配物品显示名和物品类型的例子：
 '003':
-  #注意 这里就不要再用 '§6银票' 这个名称了, 因为上面那个例子只要求物品名称一致 这里再用这个名称就完全符合上面那个例子的匹配条件了
+  #注意 这里就不要再用 '§6银票' 这个名称了, 因为上面那个例子只要求物品名称一致并且触发方式都是默认的right 这里再这样写就完全符合上面那个例子的匹配条件了
   #name: '§6银票'
   name: '§6真·银票'
   #类型为纸

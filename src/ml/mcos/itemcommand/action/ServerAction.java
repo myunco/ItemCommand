@@ -22,11 +22,6 @@ public class ServerAction extends Action {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            player.sendPluginMessage(plugin, "BungeeCord", byteOut.toByteArray());
-        } catch (Exception e) {
-            //TODO
-            e.printStackTrace();
-        }
+        player.sendPluginMessage(plugin, "BungeeCord", byteOut.toByteArray());
     }
 }

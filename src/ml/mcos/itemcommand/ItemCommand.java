@@ -30,6 +30,7 @@ public class ItemCommand extends JavaPlugin {
         //支持使用条件 支持手持触发 左键点击触发
         plugin = this;
         init();
+        getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getPluginManager().registerEvents(new PlayerInteractEventListener(), this);
         PluginCommand command = getCommand("ItemCommand");
         if (command != null) {
@@ -43,6 +44,7 @@ public class ItemCommand extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        getServer().getMessenger().unregisterOutgoingPluginChannel(this);
         UpdateChecker.stop();
     }
 
