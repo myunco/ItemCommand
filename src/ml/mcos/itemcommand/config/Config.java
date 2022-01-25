@@ -16,14 +16,11 @@ public class Config {
     public static int version;
     public static String language;
     public static boolean checkUpdate;
-
-    public static void main(String[] args) {
-        YamlConfiguration test = loadConfiguration(new File("src/items.yml"));
-        System.out.println(test.getString("001.action-left"));
-        System.out.println(test.getStringList("001.action-left"));
-        System.out.println(test.getString("001.action-right"));
-        System.out.println(test.getStringList("001.action-right"));
-    }
+    public static boolean cancelLeftEvent;
+    public static boolean cancelRightEvent;
+    public static boolean cancelHeldEvent;
+    public static boolean cancelInvLeftEvent;
+    public static boolean cancelInvRightEvent;
 
     public static void loadConfig(ItemCommand plugin) {
         plugin.saveDefaultConfig();
@@ -33,6 +30,11 @@ public class Config {
         language = config.getString("language", "zh_cn");
         Language.loadLanguage(language);
         checkUpdate = config.getBoolean("checkUpdate", true);
+        cancelLeftEvent = config.getBoolean("cancelLeftEvent", true);
+        cancelRightEvent = config.getBoolean("cancelRightEvent", true);
+        cancelHeldEvent = config.getBoolean("cancelHeldEvent", false);
+        cancelInvLeftEvent = config.getBoolean("cancelInvLeftEvent", true);
+        cancelInvRightEvent = config.getBoolean("cancelInvRightEvent", true);
     }
 
     public static YamlConfiguration loadConfiguration(File file) {

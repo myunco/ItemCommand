@@ -1,7 +1,6 @@
 package ml.mcos.itemcommand.command;
 
 import ml.mcos.itemcommand.ItemCommand;
-import ml.mcos.itemcommand.TabComplete;
 import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.update.UpdateChecker;

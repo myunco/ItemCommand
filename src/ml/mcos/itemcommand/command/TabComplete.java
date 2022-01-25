@@ -1,4 +1,4 @@
-package ml.mcos.itemcommand;
+package ml.mcos.itemcommand.command;
 
 import org.bukkit.Material;
 

@@ -22,7 +22,7 @@ public class Item {
     private final String name;
     private final List<String> lore;
     private final Material type;
-    private Trigger[] trigger;
+    private final Trigger[] trigger;
     private final Action[] action;
     private final String price;
     private final String points;
@@ -31,11 +31,12 @@ public class Item {
     private final String requiredAmount;
     private final String cooldown;
 
-    public Item(String id, String name, List<String> lore, Material type, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
+    public Item(String id, String name, List<String> lore, Material type, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
         this.id = id;
         this.name = name;
         this.lore = lore;
         this.type = type;
+        this.trigger = trigger;
         this.action = action;
         this.price = price;
         this.points = points;
@@ -110,7 +111,10 @@ public class Item {
         return cooldown;
     }
 
-    public boolean match(Player player, ItemStack item) {
+    public boolean match(Player player, ItemStack item, Trigger trigger) {
+        if (!triggerContains(trigger)) {
+            return false;
+        }
         if (type != null && type != item.getType()) {
             return false;
         }
@@ -119,6 +123,16 @@ public class Item {
             return false;
         }
         return lore.isEmpty() || (meta != null && meta.hasLore() && getLore(player).equals(meta.getLore()));
+    }
+
+    private boolean triggerContains(Trigger trigger) {
+        //noinspection ForLoopReplaceableByForEach
+        for (int i = 0; i < this.trigger.length; i++) {
+            if (this.trigger[i] == trigger) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void executeAction(Player player) {

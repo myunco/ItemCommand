@@ -15,6 +15,7 @@ import ml.mcos.itemcommand.action.SoundAction;
 import ml.mcos.itemcommand.action.TellAction;
 import ml.mcos.itemcommand.action.TitleAction;
 import ml.mcos.itemcommand.item.Item;
+import ml.mcos.itemcommand.item.Trigger;
 import ml.mcos.itemcommand.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -69,9 +70,22 @@ public class ItemInfo {
             }
         }
 
+        List<String> triggerList = config.getStringList(id + ".trigger");
+        if (triggerList.isEmpty()) {
+            triggerList.add("right");
+        }
+        Trigger[] trigger = new Trigger[triggerList.size()];
+        for (int i = 0; i < trigger.length; i++) {
+            try {
+                trigger[i] = Trigger.valueOf(triggerList.get(i).toUpperCase());
+            } catch (IllegalArgumentException e) {
+                plugin.logMessage(Language.replaceArgs(Language.loadItemErrorUnknownTrigger, id, triggerList.get(i)));
+            }
+        }
+
         List<String> actionList = config.getStringList(id + ".action");
         Action[] action = new Action[actionList.size()];
-        for (int i = 0; i < actionList.size(); i++) {
+        for (int i = 0; i < action.length; i++) {
             String actionString = actionList.get(i);
             String actionType = Utils.getTextLeft(actionString, ':');
             if (actionType.isEmpty()) {
@@ -134,12 +148,12 @@ public class ItemInfo {
         String requiredAmount = config.getString(id + ".required-amount");
         String cooldown = config.getString(id + ".cooldown");
 
-        return new Item(id, name, lore, type, action, price, points, levels, permission, requiredAmount, cooldown);
+        return new Item(id, name, lore, type, trigger, action, price, points, levels, permission, requiredAmount, cooldown);
     }
 
-    public static Item matchItem(Player player, ItemStack item) {
+    public static Item matchItem(Player player, ItemStack item, Trigger trigger) {
         for (Item it : items) {
-            if (it.match(player, item)) {
+            if (it.match(player, item, trigger)) {
                 return it;
             }
         }

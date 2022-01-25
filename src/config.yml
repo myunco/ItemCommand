@@ -6,3 +6,18 @@ language: 'zh_cn'
 
 #检查更新 (十二小时检查一次)
 checkUpdate: true
+
+#左键使用物品后是否取消点击事件
+cancelLeftEvent: true
+
+#右键使用物品后是否取消点击事件
+cancelRightEvent: true
+
+#切换手持时使用物品后是否取消切换手持事件
+cancelHeldEvent: false
+
+#物品栏内左键使用物品后是否取消点击事件
+cancelInvLeftEvent: true
+
+#物品栏内右键使用物品后是否取消点击事件
+cancelInvRightEvent: true

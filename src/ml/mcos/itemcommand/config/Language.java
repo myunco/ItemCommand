@@ -27,6 +27,7 @@ public class Language {
     public static String updateCheckException;
     public static String loadItemErrorNotMatch;
     public static String loadItemErrorUnknownType;
+    public static String loadItemErrorUnknownTrigger;
     public static String actionExecuteErrorSound;
     public static String actionExecuteErrorGiveMoneyNotFoundEconomy;
     public static String actionExecuteErrorGiveMoneyNotFoundEconomyTip;
@@ -63,6 +64,7 @@ public class Language {
         updateCheckException = config.getString("update-check-exception", "§4检查更新时发生IO异常.");
         loadItemErrorNotMatch = config.getString("load-item-error-not-match", "加载 {0} 时出错! name、lore、type 至少需要提供一个, 当前全未提供");
         loadItemErrorUnknownType = config.getString("load-item-error-unknown-type", "加载 {0} 时出错! 未知的物品类型: type: {1}");
+        loadItemErrorUnknownTrigger = config.getString("load-item-error-unknown-trigger", "§e加载 {0} 时出错! 未知的触发方式: {1}");
         actionExecuteErrorSound = config.getString("action-execute-error-sound", "§e错误: 指定的音效 {0} 不存在");
         actionExecuteErrorGiveMoneyNotFoundEconomy = config.getString("action-execute-error-give-money-not-found-economy", "§e未找到经济插件, 无法执行 give-money 动作!");
         actionExecuteErrorGiveMoneyNotFoundEconomyTip = config.getString("action-execute-error-give-money-not-found-economy-tip", "§e请检查是否正确安装Vault插件以及经济提供插件! (如Essentials、CMI、Economy等)");
