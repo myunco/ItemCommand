@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ICCommand implements TabExecutor {
@@ -37,20 +38,24 @@ public class ICCommand implements TabExecutor {
                 commandGive(sender, args);
                 break;
             case "list":
-                sendMessage(sender, "§6已加载的物品ID列表: §a" + String.join(", ", ItemInfo.idList));
+                sendMessage(sender, Language.replaceArgs(Language.commandList, String.join(", ", ItemInfo.idList)));
                 break;
             case "reload":
                 UpdateChecker.stop();
                 plugin.init();
-                sendMessage(sender, "§a配置文件重载完成");
+                sendMessage(sender, Language.commandReload);
                 break;
             case "version":
-                sendMessage(sender, "§a当前版本: §b" + plugin.getDescription().getVersion());
+                sendMessage(sender, Language.replaceArgs(Language.commandVersion, plugin.getDescription().getVersion()));
                 break;
             default:
-                sendMessage(sender, "§6未知的子命令");
+                sendMessage(sender, Language.commandUnknown);
         }
         return true;
+    }
+
+    private void sendMessage(CommandSender sender, String message) {
+        sender.sendMessage(Language.messagePrefix + message);
     }
 
     @Override
@@ -91,7 +96,7 @@ public class ICCommand implements TabExecutor {
         if (sender instanceof Player) {
             ItemStack item = ((Player) sender).getInventory().getItemInMainHand();
             if (item.getType() == Material.AIR) {
-                sendMessage(sender, "§d你确定你手里有物品？");
+                sendMessage(sender, Language.commandAddNotItem);
                 return;
             }
             boolean def = args.length == 1;
@@ -100,35 +105,60 @@ public class ICCommand implements TabExecutor {
             String id = String.valueOf(System.currentTimeMillis());
             if (def || containsIgnoreCase(args, "name")) {
                 if (meta == null || !meta.hasDisplayName()) {
-                    sendMessage(sender, "§a你手中的物品没有显示名称, 无法添加name项。");
+                    sendMessage(sender, Language.commandAddNotName);
                 } else {
                     ItemInfo.config.set(id + ".name", meta.getDisplayName());
                     flag = true;
                 }
             }
-            if (!def && containsIgnoreCase(args, "lore")) {
-                if (meta == null || !meta.hasLore()) {
-                    sendMessage(sender, "§a你手中的物品没有Lore, 无法添加lore项。");
-                } else {
-                    ItemInfo.config.set(id + ".lore", meta.getLore());
+            if (!def) {
+                if (containsIgnoreCase(args, "lore")) {
+                    if (meta == null || !meta.hasLore()) {
+                        sendMessage(sender, Language.commandAddNotLore);
+                    } else {
+                        ItemInfo.config.set(id + ".lore", meta.getLore());
+                        flag = true;
+                    }
+                }
+                if (containsIgnoreCase(args, "type")) {
+                    ItemInfo.config.set(id + ".type", item.getType().toString());
                     flag = true;
                 }
-            }
-            if (!def && containsIgnoreCase(args, "type")) {
-                ItemInfo.config.set(id + ".type", item.getType().toString());
-                flag = true;
+                if (containsIgnoreCase(args, "condition")) {
+                    ItemInfo.config.set(id + ".condition", Collections.singletonList("true"));
+                }
+                if (containsIgnoreCase(args, "trigger")) {
+                    ItemInfo.config.set(id + ".trigger", Collections.singletonList("right"));
+                }
+                if (containsIgnoreCase(args, "action")) {
+                    ItemInfo.config.set(id + ".action", Collections.singletonList("example"));
+                }
+                if (containsIgnoreCase(args, "price")) {
+                    ItemInfo.config.set(id + ".price", "0");
+                }
+                if (containsIgnoreCase(args, "points")) {
+                    ItemInfo.config.set(id + ".points", "0");
+                }
+                if (containsIgnoreCase(args, "levels")) {
+                    ItemInfo.config.set(id + ".levels", "0");
+                }
+                if (containsIgnoreCase(args, "permission")) {
+                    ItemInfo.config.set(id + ".permission", "example");
+                }
+                if (containsIgnoreCase(args, "required-amount")) {
+                    ItemInfo.config.set(id + ".required-amount", "1");
+                }
+                if (containsIgnoreCase(args, "cooldown")) {
+                    ItemInfo.config.set(id + ".cooldown", "0");
+                }
             }
             if (flag) {
                 ItemInfo.saveConfig();
-                sendMessage(sender, "§a已添加到配置文件, ID为: " + id + ", 快去修改吧!");
+                sendMessage(sender, Language.replaceArgs(Language.commandAdd, id));
             }
             return;
         }
-        sendMessage(sender, "§a控制台无法使用此命令。");
-    }
-
-    private void sendMessage(CommandSender sender, String message) {
-        sender.sendMessage(Language.messagePrefix + message);
+        sendMessage(sender, Language.commandAddConsole);
     }
 
     private boolean containsIgnoreCase(String[] array, String ele) {
@@ -142,20 +172,22 @@ public class ICCommand implements TabExecutor {
 
     private void commandGive(CommandSender sender, String[] args) {
         if (args.length < 4) {
-            sendMessage(sender, "§6用法: /ic give <玩家> <物品ID> <物品数量> [物品类型]");
-            sendMessage(sender, "§7(物品类型参数仅在指定ID的物品配置中未指定物品类型时生效, 默认为石头)");
-            sendMessage(sender, "§b<> = 必填参数 [] = 可选参数");
+            sendMessage(sender, Language.commandGiveUsage);
+            sendMessage(sender, Language.commandGiveTip1);
+            sendMessage(sender, Language.commandGiveTip2);
             return;
         }
         Player player = plugin.getServer().getPlayer(args[1]);
         if (player == null) {
-            sendMessage(sender, "§c指定的玩家不在线或不存在!");
+            sendMessage(sender, Language.commandGiveNotFoundPlayer);
         } else if (!ItemInfo.idList.contains(args[2])) {
-            sendMessage(sender, "§c指定的ID不存在或未能正确加载.");
+            sendMessage(sender, Language.commandGiveNotFoundId);
         } else {
             int amount = Utils.parseInt(args[3]);
-            if (amount < 1) {
-                sendMessage(sender, "§c错误: 物品数量不能小于1!");
+            if (amount == -1) {
+                sendMessage(sender, Language.replaceArgs(Language.commandGiveInvalidAmount, amount));
+            } else if (amount == 0) {
+                sendMessage(sender, Language.commandGiveErrorAmount);
                 return;
             }
             String name = ItemInfo.config.getString(args[2] + ".name");
@@ -168,7 +200,7 @@ public class ICCommand implements TabExecutor {
             try {
                 type = Material.valueOf(typeString);
             } catch (IllegalArgumentException e) {
-                sendMessage(sender, "§c无效的物品类型: " + typeString);
+                sendMessage(sender, Language.replaceArgs(Language.commandGiveInvalidType, typeString));
                 return;
             }
             ItemStack item = new ItemStack(type, amount);
@@ -184,7 +216,7 @@ public class ICCommand implements TabExecutor {
                 item.setItemMeta(meta);
             }
             player.getInventory().addItem(item);
-            sendMessage(sender, "§a已将§b" + amount + "§a个" + (name == null ? typeString : name) + "§a添加到该玩家的物品栏.");
+            sendMessage(sender, Language.replaceArgs(Language.commandGive, amount, name == null ? typeString : name, player.getName()));
         }
     }
 

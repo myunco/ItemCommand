@@ -5,7 +5,7 @@ import ml.mcos.itemcommand.command.ICCommand;
 import ml.mcos.itemcommand.config.Config;
 import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.config.Language;
-import ml.mcos.itemcommand.listener.PlayerInteractEventListener;
+import ml.mcos.itemcommand.listener.PlayerInvolveEventListener;
 import ml.mcos.itemcommand.metrics.Metrics;
 import ml.mcos.itemcommand.update.UpdateChecker;
 import net.milkbowl.vault.economy.Economy;
@@ -31,7 +31,7 @@ public class ItemCommand extends JavaPlugin {
         plugin = this;
         init();
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
-        getServer().getPluginManager().registerEvents(new PlayerInteractEventListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerInvolveEventListener(), this);
         PluginCommand command = getCommand("ItemCommand");
         if (command != null) {
             command.setExecutor(new ICCommand(this));
@@ -50,7 +50,6 @@ public class ItemCommand extends JavaPlugin {
 
     public void init() {
         Config.loadConfig(this);
-        ItemInfo.loadItemInfo(this);
         if (Config.checkUpdate) {
             UpdateChecker.start();
         }
@@ -66,6 +65,7 @@ public class ItemCommand extends JavaPlugin {
             papiVersion = papi.getDescription().getVersion();
             logMessage("Found PlaceholderAPI: §3v" + papiVersion);
         }
+        ItemInfo.loadItemInfo(this);
     }
 
     public static ItemCommand getPlugin() {

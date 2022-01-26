@@ -22,10 +22,10 @@
     - 'left'
     - 'right'
   #物品使用后执行的动作 一行一个动作 支持变量 可选 没有此项则不执行任何动作
+  #可选的动作有: cmd, op, console, tell, chat, sound, broadcast, give-money, give-points,
+  #  title, title-all, action-bar, action-bar-all, server 不指定默认为cmd
+  #格式为 动作: 值 (动作后面需要紧跟一个英文冒号 否则无法识别出正确动作会默认为整行都是cmd动作的值)
   action:
-    #可选的动作有: cmd, op, console, tell, chat, sound, broadcast, give-money, give-points,
-    #  title, title-all, action-bar, action-bar-all, server 不指定默认为cmd
-    #格式为 动作: 值 (动作后面需要紧跟一个英文冒号 否则无法识别出正确动作会默认为整行都是cmd动作的值)
     #cmd = 让使用物品的玩家执行的命令 命令不需要加 /
     - 'cmd: help'
     #op = 让使用物品的玩家以op身份执行的命令 同样不需要加 /
@@ -100,4 +100,39 @@
   action:
     - 'op: tpr'
     - 'sound: ITEM_BOOK_PAGE_TURN'
+  required-amount: 1
+
+#同一种物品不同触发方式执行不同动作的例子(005、006)：
+'005':
+  name: '§6§l新手保护券'
+  lore:
+    - '§d持有此保护券可在死亡时保留物品栏以及经验。'
+    - '§a使用方法: §b放在物品栏中自动生效'
+    - '§5类型: §c消耗品'
+    - ''
+    - '§7注: 本券为消耗品，每张仅能使用一次。'
+  type: PAPER
+  trigger:
+    #手持时触发
+    - 'held'
+  action:
+    - 'tell: §a用不到新手保护券？右键使用每张可兑换10级经验。'
+
+#虽然006和005的name、lore、type相同，但是触发方式并不重叠，所以不会冲突。
+'006':
+  name: '§6§l新手保护券'
+  lore:
+    - '§d持有此保护券可在死亡时保留物品栏以及经验。'
+    - '§a使用方法: §b放在物品栏中自动生效'
+    - '§5类型: §c消耗品'
+    - ''
+    - '§7注: 本券为消耗品，每张仅能使用一次。'
+  type: PAPER
+  trigger:
+    #右键点击触发
+    - 'right'
+  action:
+    - 'console: xp add {player} 10 levels'
+    - 'tell: §a你使用一张新手保护券兑换了10级经验。'
+    - 'sound: ENTITY_EXPERIENCE_ORB_PICKUP'
   required-amount: 1

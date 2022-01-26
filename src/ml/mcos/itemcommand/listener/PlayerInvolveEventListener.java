@@ -2,6 +2,7 @@ package ml.mcos.itemcommand.listener;
 
 import ml.mcos.itemcommand.config.Config;
 import ml.mcos.itemcommand.config.ItemInfo;
+import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.item.Item;
 import ml.mcos.itemcommand.item.Trigger;
 import org.bukkit.Material;
@@ -19,7 +20,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
 
-public class PlayerInteractEventListener implements Listener {
+public class PlayerInvolveEventListener implements Listener {
     private static final HashMap<String, HashMap<String, Long>> cdMap = new HashMap<>();
 
     @EventHandler(priority = EventPriority.LOW)
@@ -44,7 +45,7 @@ public class PlayerInteractEventListener implements Listener {
                     cancel = false;
                     item = null;
             }
-            if (item != null && useItem(player, item, itemStack)) {
+            if (item != null && useItem(player, item, itemStack, player.getInventory().getHeldItemSlot())) {
                 if (!event.isCancelled() && cancel) {
                     event.setCancelled(true);
                 }
@@ -58,7 +59,7 @@ public class PlayerInteractEventListener implements Listener {
         ItemStack itemStack = player.getInventory().getItem(event.getNewSlot());
         if (itemStack != null) {
             Item item = ItemInfo.matchItem(player, itemStack, Trigger.HELD);
-            if (item != null && useItem(player, item, itemStack) && Config.cancelHeldEvent) {
+            if (item != null && useItem(player, item, itemStack, event.getNewSlot()) && Config.cancelHeldEvent) {
                 event.setCancelled(true);
             }
         }
@@ -88,14 +89,14 @@ public class PlayerInteractEventListener implements Listener {
                         item = null;
                         cancel = false;
                 }
-                if (item != null && useItem(player, item, itemStack) && cancel) {
+                if (item != null && useItem(player, item, itemStack, event.getSlot()) && cancel) {
                     event.setCancelled(true);
                 }
             }
         }
     }
 
-    private static boolean useItem(Player player, Item item, ItemStack itemStack) {
+    private static boolean useItem(Player player, Item item, ItemStack itemStack, int slot) {
         if (item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player, item.getId()) && item.charge(player)) {
             int cooldown = item.getCooldown(player);
             if (cooldown > 0) {
@@ -106,7 +107,7 @@ public class PlayerInteractEventListener implements Listener {
                 if (itemStack.getAmount() > requiredAmount) {
                     itemStack.setAmount(itemStack.getAmount() - requiredAmount);
                 } else if (itemStack.getAmount() == requiredAmount) {
-                    player.getInventory().setItemInMainHand(null);
+                    player.getInventory().setItem(slot, null);
                 } else {
                     ItemStack is = itemStack.clone();
                     is.setAmount(requiredAmount);
@@ -136,7 +137,7 @@ public class PlayerInteractEventListener implements Listener {
         if (time < current) {
             return false;
         }
-        player.sendMessage("§4使用冷却: §c" + (int) ((time - current) / 1000) + "§4秒。");
+        player.sendMessage(Language.replaceArgs(Language.useItemCooling, (int) ((time - current) / 1000)));
         return true;
     }
 
