@@ -37,6 +37,7 @@ public class Language {
     public static String actionExecuteErrorGivePointsInvalidValue;
     public static String actionExecuteErrorTitleArgsError;
     public static String actionExecuteErrorTitleNotSupport;
+    public static String actionExecuteErrorTitleInvalidTime;
     public static String actionExecuteErrorActionBarNotSupport;
     public static String useItemCooling;
     public static String useItemErrorPrice;
@@ -105,6 +106,7 @@ public class Language {
         actionExecuteErrorGivePointsInvalidValue = config.getString("action-execute-error-give-points-invalid-value", "§e错误: 无法执行 give-points 动作! 原因: 无效的数字格式: {0}");
         actionExecuteErrorTitleArgsError = config.getString("action-execute-error-title-args-error", "§e错误: 无法执行 title(-all) 动作! 原因: 无效的参数格式: {0}");
         actionExecuteErrorTitleNotSupport = config.getString("action-execute-error-title-not-support", "§e错误: 无法执行 title(-all) 动作! 原因: 当前服务端不支持此操作");
+        actionExecuteErrorTitleInvalidTime = config.getString("action-execute-error-title-invalid-time", "§e错误: 无法执行 title(-all) 动作! 原因: 无效的显示时间: {0}");
         actionExecuteErrorActionBarNotSupport = config.getString("action-execute-error-action-bar-not-support", "§e错误: 无法执行 action-bar(-all) 动作! 原因: 当前服务端不支持此操作");
         useItemCooling = config.getString("use-item-cooling", "§4使用冷却: §c{0}§4秒。");
         useItemErrorPrice = config.getString("use-item-error-price", "§e解析 {0} 时出错! 无效的花费: price: {1}");

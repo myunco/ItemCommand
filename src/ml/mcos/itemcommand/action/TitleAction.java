@@ -18,6 +18,10 @@ public class TitleAction extends Action {
 
     @Override
     public void execute(Player player) {
+        if (plugin.getMcVersion() <= 10) {
+            plugin.logMessage(Language.actionExecuteErrorTitleNotSupport);
+            return;
+        }
         String[] args = value.split(",");
         if (args.length != 3) {
             plugin.logMessage(Language.actionExecuteErrorTitleArgsError);
@@ -27,18 +31,18 @@ public class TitleAction extends Action {
             for (Player p : plugin.getServer().getOnlinePlayers()) {
                 int time = Utils.parseInt(plugin.replacePlaceholders(p, args[2]));
                 if (time == -1) {
-                    plugin.logMessage(Language.actionExecuteErrorTitleNotSupport);
+                    plugin.logMessage(Language.actionExecuteErrorTitleInvalidTime);
                     return;
                 } else if (time > 0) {
-                    p.sendTitle(plugin.replacePlaceholders(p, args[0]), plugin.replacePlaceholders(p, args[1]), 10, time, 10);
+                    p.sendTitle(plugin.replacePlaceholders(p, args[0]), plugin.replacePlaceholders(p, args[1]), 10, time * 20, 10);
                 }
             }
         } else {
             int time = Utils.parseInt(plugin.replacePlaceholders(player, args[2]));
             if (time == -1) {
-                plugin.logMessage(Language.actionExecuteErrorTitleNotSupport);
+                plugin.logMessage(Language.actionExecuteErrorTitleInvalidTime);
             } else if (time > 0) {
-                player.sendTitle(plugin.replacePlaceholders(player, args[0]), plugin.replacePlaceholders(player, args[1]), 10, time, 10);
+                player.sendTitle(plugin.replacePlaceholders(player, args[0]), plugin.replacePlaceholders(player, args[1]), 10, time * 20, 10);
             }
         }
     }

@@ -23,12 +23,16 @@ public class ItemCommand extends JavaPlugin {
     private PlayerPoints points;
     private boolean enablePAPI;
     private String papiVersion;
+    private int mcVersion;
+    private int mcVersionPatch;
 
     @Override
     public void onEnable() {
         //TODO
-        //支持使用条件 支持手持触发 左键点击触发
+        //支持使用条件
         plugin = this;
+        mcVersion = getMinecraftVersion();
+        getLogger().info("Minecraft version: 1" + mcVersion + mcVersionPatch);
         init();
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getPluginManager().registerEvents(new PlayerInvolveEventListener(), this);
@@ -70,6 +74,15 @@ public class ItemCommand extends JavaPlugin {
 
     public static ItemCommand getPlugin() {
         return plugin;
+    }
+
+    private int getMinecraftVersion() {
+        String[] version = getServer().getBukkitVersion().replace('-', '.').split("\\.");
+        try {
+            mcVersionPatch = Integer.parseInt(version[2]);
+        } catch (NumberFormatException ignored) {
+        }
+        return Integer.parseInt(version[1]);
     }
 
     public void setupEconomy() {
@@ -131,6 +144,14 @@ public class ItemCommand extends JavaPlugin {
 
     public void logMessage(String message) {
         getServer().getConsoleSender().sendMessage(Language.logPrefix + message);
+    }
+
+    public int getMcVersion() {
+        return mcVersion;
+    }
+
+    public int getMcVersionPatch() {
+        return mcVersionPatch;
     }
 
 }

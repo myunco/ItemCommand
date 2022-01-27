@@ -134,22 +134,22 @@ public class ICCommand implements TabExecutor {
                     ItemInfo.config.set(id + ".action", Collections.singletonList("example"));
                 }
                 if (containsIgnoreCase(args, "price")) {
-                    ItemInfo.config.set(id + ".price", "0");
+                    ItemInfo.config.set(id + ".price", 0);
                 }
                 if (containsIgnoreCase(args, "points")) {
-                    ItemInfo.config.set(id + ".points", "0");
+                    ItemInfo.config.set(id + ".points", 0);
                 }
                 if (containsIgnoreCase(args, "levels")) {
-                    ItemInfo.config.set(id + ".levels", "0");
+                    ItemInfo.config.set(id + ".levels", 0);
                 }
                 if (containsIgnoreCase(args, "permission")) {
                     ItemInfo.config.set(id + ".permission", "example");
                 }
                 if (containsIgnoreCase(args, "required-amount")) {
-                    ItemInfo.config.set(id + ".required-amount", "1");
+                    ItemInfo.config.set(id + ".required-amount", 1);
                 }
                 if (containsIgnoreCase(args, "cooldown")) {
-                    ItemInfo.config.set(id + ".cooldown", "0");
+                    ItemInfo.config.set(id + ".cooldown", 0);
                 }
             }
             if (flag) {
@@ -190,8 +190,11 @@ public class ICCommand implements TabExecutor {
                 sendMessage(sender, Language.commandGiveErrorAmount);
                 return;
             }
-            String name = ItemInfo.config.getString(args[2] + ".name");
-            List<String> lore = ItemInfo.config.getStringList(args[2] + ".lore");
+            String name = plugin.replacePlaceholders(player, ItemInfo.config.getString(args[2] + ".name"));
+            List<String> lore = new ArrayList<>();
+            for (String s : ItemInfo.config.getStringList(args[2] + ".lore")) {
+                lore.add(plugin.replacePlaceholders(player, s));
+            }
             String typeString = ItemInfo.config.getString(args[2] + ".type");
             if (typeString == null) {
                 typeString = args.length == 4 ? "STONE" : args[4];

@@ -57,7 +57,7 @@ public class Item {
 
     public List<String> getLore(Player player) {
         for (String s : lore) {
-            if (ItemCommand.mayContainPlaceholders(s)) {
+            if (ItemCommand.mayContainPlaceholders(s) || s.indexOf('{') != -1) {
                 ArrayList<String> resultLore = new ArrayList<>(lore.size());
                 for (String s1 : lore) {
                     resultLore.add(plugin.replacePlaceholders(player, s1));
