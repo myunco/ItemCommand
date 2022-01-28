@@ -3,6 +3,7 @@ package ml.mcos.itemcommand.item;
 import ml.mcos.itemcommand.ItemCommand;
 import ml.mcos.itemcommand.action.Action;
 import ml.mcos.itemcommand.config.Language;
+import ml.mcos.itemcommand.item.expression.Expression;
 import ml.mcos.itemcommand.util.Utils;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
@@ -23,6 +24,7 @@ public class Item {
     private final String name;
     private final List<String> lore;
     private final Material type;
+    private final Expression[] condition;
     private final Trigger[] trigger;
     private final Action[] action;
     private final String price;
@@ -32,11 +34,12 @@ public class Item {
     private final String requiredAmount;
     private final String cooldown;
 
-    public Item(String id, String name, List<String> lore, Material type, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
+    public Item(String id, String name, List<String> lore, Material type, Expression[] condition, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
         this.id = id;
         this.name = name;
         this.lore = lore;
         this.type = type;
+        this.condition = condition;
         this.trigger = trigger;
         this.action = action;
         this.price = price;
@@ -124,6 +127,19 @@ public class Item {
             return false;
         }
         return lore.isEmpty() || (meta != null && meta.hasLore() && getLore(player).equals(meta.getLore()));
+    }
+
+    public boolean matchCondition(Player player) {
+        for (Expression expression : condition) {
+            if (!expression.execute(player)) {
+                String msg = expression.getMessage(player);
+                if (msg != null && !msg.isEmpty()) {
+                    player.sendMessage(msg);
+                }
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean triggerContains(Trigger trigger) {

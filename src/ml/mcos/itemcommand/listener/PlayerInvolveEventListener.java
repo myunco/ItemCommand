@@ -97,7 +97,7 @@ public class PlayerInvolveEventListener implements Listener {
     }
 
     private static boolean useItem(Player player, Item item, ItemStack itemStack, int slot) {
-        if (item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player, item.getId()) && item.charge(player)) {
+        if (item.matchCondition(player) && item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player, item.getId()) && item.charge(player)) {
             int cooldown = item.getCooldown(player);
             if (cooldown > 0) {
                 putCooldown(player.getName(), item.getId(), cooldown);

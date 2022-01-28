@@ -67,15 +67,15 @@ public class ICCommand implements TabExecutor {
                 list.removeAll(mergeArgs(args));
                 return list.isEmpty() ? list : TabComplete.getCompleteList(args, list);
             }
-            if (args[0].equalsIgnoreCase("give")) {
-                switch (args.length) {
-                    case 3:
-                        return TabComplete.getCompleteList(args, ItemInfo.idList, true);
-                    case 4:
-                        return TabComplete.getCompleteList(args, TabComplete.amountList);
-                    case 5:
-                        return TabComplete.getCompleteList(args, TabComplete.typeList, true);
-                }
+        }
+        if (args[0].equalsIgnoreCase("give")) {
+            switch (args.length) {
+                case 3:
+                    return TabComplete.getCompleteList(args, ItemInfo.idList, true);
+                case 4:
+                    return TabComplete.getCompleteList(args, TabComplete.amountList);
+                case 5:
+                    return TabComplete.getCompleteList(args, TabComplete.typeList, true);
             }
         }
         return TabComplete.getCompleteList(args, TabComplete.getTabList(args, command.getName()));

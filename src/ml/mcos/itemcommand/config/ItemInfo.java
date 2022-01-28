@@ -16,6 +16,10 @@ import ml.mcos.itemcommand.action.TellAction;
 import ml.mcos.itemcommand.action.TitleAction;
 import ml.mcos.itemcommand.item.Item;
 import ml.mcos.itemcommand.item.Trigger;
+import ml.mcos.itemcommand.item.expression.Expression;
+import ml.mcos.itemcommand.item.expression.SimpleBooleanExpression;
+import ml.mcos.itemcommand.item.expression.SimpleDecimalExpression;
+import ml.mcos.itemcommand.item.expression.SimpleStringExpression;
 import ml.mcos.itemcommand.util.Utils;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -67,6 +71,28 @@ public class ItemInfo {
                 type = Material.valueOf(typeString);
             } catch (IllegalArgumentException e) {
                 plugin.logMessage(Language.replaceArgs(Language.loadItemErrorUnknownType, id, typeString));
+            }
+        }
+
+        List<String> conditionList = config.getStringList(id + ".condition");
+        Expression[] condition = new Expression[conditionList.size()];
+        for (int i = 0; i < condition.length; i++) {
+            String conditionString = conditionList.get(i).trim();
+            String conditionType = Utils.getTextLeft(conditionString, ':');
+            if (conditionType.isEmpty()) {
+                condition[i] = new SimpleBooleanExpression(conditionString);
+            } else {
+                String conditionValue = Utils.getTextRight(conditionString, ':').trim();
+                switch (conditionType.toLowerCase()) {
+                    case "s":
+                        condition[i] = new SimpleStringExpression(conditionValue);
+                        break;
+                    case "d":
+                        condition[i] = new SimpleDecimalExpression(conditionValue);
+                        break;
+                    default:
+                        condition[i] = new SimpleBooleanExpression(conditionString);
+                }
             }
         }
 
@@ -148,7 +174,7 @@ public class ItemInfo {
         String requiredAmount = config.getString(id + ".required-amount");
         String cooldown = config.getString(id + ".cooldown");
 
-        return new Item(id, name, lore, type, trigger, action, price, points, levels, permission, requiredAmount, cooldown);
+        return new Item(id, name, lore, type, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown);
     }
 
     public static Item matchItem(Player player, ItemStack item, Trigger trigger) {

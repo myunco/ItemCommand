@@ -27,6 +27,7 @@ public class Language {
     public static String updateCheckException;
     public static String loadItemErrorNotMatch;
     public static String loadItemErrorUnknownType;
+    public static String loadItemErrorNotFoundOperator;
     public static String loadItemErrorUnknownTrigger;
     public static String actionExecuteErrorSound;
     public static String actionExecuteErrorGiveMoneyNotFoundEconomy;
@@ -40,6 +41,7 @@ public class Language {
     public static String actionExecuteErrorTitleInvalidTime;
     public static String actionExecuteErrorActionBarNotSupport;
     public static String useItemCooling;
+    public static String useItemConditionInvalidNumber;
     public static String useItemErrorPrice;
     public static String useItemErrorPoints;
     public static String useItemErrorLevels;
@@ -96,6 +98,7 @@ public class Language {
         updateCheckException = config.getString("update-check-exception", "§4检查更新时发生IO异常.");
         loadItemErrorNotMatch = config.getString("load-item-error-not-match", "§e加载 {0} 时出错! name、lore、type 至少需要提供一个, 当前全未提供");
         loadItemErrorUnknownType = config.getString("load-item-error-unknown-type", "§e加载 {0} 时出错! 未知的物品类型: type: {1}");
+        loadItemErrorNotFoundOperator = config.getString("load-item-error-not-found-operator", "§e加载条件时出错! 在条件中未找到运算符: {0}");
         loadItemErrorUnknownTrigger = config.getString("load-item-error-unknown-trigger", "§e加载 {0} 时出错! 未知的触发方式: {1}");
         actionExecuteErrorSound = config.getString("action-execute-error-sound", "§e错误: 指定的音效 {0} 不存在");
         actionExecuteErrorGiveMoneyNotFoundEconomy = config.getString("action-execute-error-give-money-not-found-economy", "§e未找到经济插件, 无法执行 give-money 动作!");
@@ -109,6 +112,7 @@ public class Language {
         actionExecuteErrorTitleInvalidTime = config.getString("action-execute-error-title-invalid-time", "§e错误: 无法执行 title(-all) 动作! 原因: 无效的显示时间: {0}");
         actionExecuteErrorActionBarNotSupport = config.getString("action-execute-error-action-bar-not-support", "§e错误: 无法执行 action-bar(-all) 动作! 原因: 当前服务端不支持此操作");
         useItemCooling = config.getString("use-item-cooling", "§4使用冷却: §c{0}§4秒。");
+        useItemConditionInvalidNumber = config.getString("use-item-condition-invalid-number", "§e解析条件时出错! 在数值比较表达式中发现无效数字: {0}");
         useItemErrorPrice = config.getString("use-item-error-price", "§e解析 {0} 时出错! 无效的花费: price: {1}");
         useItemErrorPoints = config.getString("use-item-error-points", "§e解析 {0} 时出错! 无效的花费: points: {1}");
         useItemErrorLevels = config.getString("use-item-error-levels", "§e解析 {0} 时出错! 无效的花费: levels: {1}");

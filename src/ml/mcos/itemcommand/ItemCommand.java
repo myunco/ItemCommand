@@ -28,8 +28,6 @@ public class ItemCommand extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        //TODO
-        //支持使用条件
         plugin = this;
         mcVersion = getMinecraftVersion();
         getLogger().info("Minecraft version: 1" + mcVersion + mcVersionPatch);
@@ -148,10 +146,6 @@ public class ItemCommand extends JavaPlugin {
 
     public int getMcVersion() {
         return mcVersion;
-    }
-
-    public int getMcVersionPatch() {
-        return mcVersionPatch;
     }
 
 }

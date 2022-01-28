@@ -16,6 +16,7 @@ update-check-failure: '§e检查更新失败, 状态码: '
 update-check-exception: '§4检查更新时发生IO异常.'
 load-item-error-not-match: '§4加载 {0} 时出错! name、lore、type 至少需要提供一个, 当前全未提供'
 load-item-error-unknown-type: '§e加载 {0} 时出错! 未知的物品类型: type: {1}'
+load-item-error-not-found-operator: '§e加载条件时出错! 在条件中未找到运算符: {0}'
 load-item-error-unknown-trigger: '§e加载 {0} 时出错! 未知的触发方式: {1}'
 action-execute-error-sound: '§e错误: 指定的音效 {0} 不存在'
 action-execute-error-give-money-not-found-economy: '§e未找到经济插件, 无法执行 give-money 动作!'
@@ -29,6 +30,7 @@ action-execute-error-title-not-support: '§e错误: 无法执行 title(-all) 动
 action-execute-error-title-invalid-time: '§e错误: 无法执行 title(-all) 动作! 原因: 无效的显示时间: {0}'
 action-execute-error-action-bar-not-support: '§e错误: 无法执行 action-bar(-all) 动作! 原因: 当前服务端不支持此操作'
 use-item-cooling: '§4使用冷却: §c{0}§4秒。'
+use-item-condition-invalid-number: '§e解析条件时出错! 在数值比较表达式中发现无效数字: {0}'
 use-item-error-price: '§e解析 {0} 时出错! 无效的花费: price: {1}'
 use-item-error-points: '§e解析 {0} 时出错! 无效的花费: points: {1}'
 use-item-error-levels: '§e解析 {0} 时出错! 无效的花费: levels: {1}'
@@ -59,6 +61,3 @@ command-give-invalid-amount: '§c参数错误: 无效的数量: {0}'
 command-give-error-amount: '§c错误: 物品数量不能小于1'
 command-give-invalid-type: '§c错误: 无效的物品类型: {0}'
 command-give: '§a已将§b{0}§a个{1}§a添加到§c{2}§a的物品栏.'
-
-
-

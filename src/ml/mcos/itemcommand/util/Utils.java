@@ -40,4 +40,14 @@ public class Utils {
         return index == -1 ? "" : text.substring(index + 1);
     }
 
+    public static String getTextLeft(String text, String s) {
+        int index = text.indexOf(s);
+        return index == -1 ? "" : text.substring(0, index);
+    }
+
+    public static String getTextRight(String text, String s) {
+        int index = text.indexOf(s);
+        return index == -1 ? "" : text.substring(index + s.length());
+    }
+
 }
