@@ -19,23 +19,20 @@ public class ActionBarAction extends Action {
 
     @Override
     public void execute(Player player) {
-        if (all) {
-            for (Player p : plugin.getServer().getOnlinePlayers()) {
-                try {
+        if (plugin.getMcVersion() < 9) {
+            plugin.logMessage(Language.actionExecuteErrorActionBarNotSupport);
+            return;
+        }
+        try {
+            if (all) {
+                for (Player p : plugin.getServer().getOnlinePlayers()) {
                     p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(plugin.replacePlaceholders(p, value)));
-                } catch (Exception e) {
-                    plugin.logMessage(Language.actionExecuteErrorActionBarNotSupport);
-                    return;
                 }
-            }
-        } else {
-            try {
+            } else {
                 player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(plugin.replacePlaceholders(player, value)));
-            } catch (Exception e) {
-                //TODO
-                e.printStackTrace();
-                plugin.logMessage(Language.actionExecuteErrorActionBarNotSupport);
             }
+        } catch (Throwable t) {
+            plugin.logMessage(Language.actionExecuteErrorActionBarNotSupport);
         }
     }
 }

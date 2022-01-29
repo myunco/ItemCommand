@@ -12,7 +12,15 @@ commands:
     usage: '§6用法: /ItemCommand §e<§6add§7|§6give§7|§6list§7|§6reload§7|§6version§e>'
     aliases: ic
     permission: itemcommand.admin
-    permission-message: You don''t have permission!
+    permission-message: '§cYou don''t have permission!'
 permissions:
   itemcommand.admin:
+    default: op
+  itemcommand.cooldown.bypass:
+    default: op
+  itemcommand.price.free:
+    default: op
+  itemcommand.points.free:
+    default: op
+  itemcommand.levels.free:
     default: op

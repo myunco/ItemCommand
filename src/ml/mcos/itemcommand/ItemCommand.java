@@ -148,4 +148,8 @@ public class ItemCommand extends JavaPlugin {
         return mcVersion;
     }
 
+    public int getMcVersionPatch() {
+        return mcVersionPatch;
+    }
+
 }

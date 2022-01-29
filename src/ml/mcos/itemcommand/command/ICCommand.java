@@ -92,9 +92,10 @@ public class ICCommand implements TabExecutor {
         return list;
     }
 
+    @SuppressWarnings("deprecation")
     private void commandAdd(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
-            ItemStack item = ((Player) sender).getInventory().getItemInMainHand();
+            ItemStack item = plugin.getMcVersion() > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandAddNotItem);
                 return;
@@ -125,7 +126,7 @@ public class ICCommand implements TabExecutor {
                     flag = true;
                 }
                 if (containsIgnoreCase(args, "condition")) {
-                    ItemInfo.config.set(id + ".condition", Collections.singletonList("true"));
+                    ItemInfo.config.set(id + ".condition", Collections.singletonList("true,"));
                 }
                 if (containsIgnoreCase(args, "trigger")) {
                     ItemInfo.config.set(id + ".trigger", Collections.singletonList("right"));
@@ -186,6 +187,7 @@ public class ICCommand implements TabExecutor {
             int amount = Utils.parseInt(args[3]);
             if (amount == -1) {
                 sendMessage(sender, Language.replaceArgs(Language.commandGiveInvalidAmount, amount));
+                return;
             } else if (amount == 0) {
                 sendMessage(sender, Language.commandGiveErrorAmount);
                 return;

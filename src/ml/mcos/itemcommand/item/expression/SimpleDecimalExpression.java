@@ -31,9 +31,14 @@ public class SimpleDecimalExpression implements Expression {
         BigDecimal right;
         try {
             left = new BigDecimal(plugin.replacePlaceholders(player, this.left));
+        } catch (NumberFormatException e) {
+            plugin.logMessage(Language.replaceArgs(Language.useItemConditionInvalidNumber, plugin.replacePlaceholders(player, this.left)));
+            return false;
+        }
+        try {
             right = new BigDecimal(plugin.replacePlaceholders(player, this.right));
         } catch (NumberFormatException e) {
-            plugin.logMessage(Language.replaceArgs(Language.useItemConditionInvalidNumber, e.getMessage()));
+            plugin.logMessage(Language.replaceArgs(Language.useItemConditionInvalidNumber, plugin.replacePlaceholders(player, this.right)));
             return false;
         }
         switch (operator) {

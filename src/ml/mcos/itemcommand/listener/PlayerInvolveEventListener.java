@@ -1,5 +1,6 @@
 package ml.mcos.itemcommand.listener;
 
+import ml.mcos.itemcommand.ItemCommand;
 import ml.mcos.itemcommand.config.Config;
 import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.config.Language;
@@ -13,6 +14,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.CraftingInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,10 +24,11 @@ import java.util.HashMap;
 
 public class PlayerInvolveEventListener implements Listener {
     private static final HashMap<String, HashMap<String, Long>> cdMap = new HashMap<>();
+    private final int mcVersion = ItemCommand.getPlugin().getMcVersion();
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerInteractEvent(PlayerInteractEvent event) {
-        if (event.getHand() == EquipmentSlot.HAND && event.hasItem()) {
+        if ((mcVersion < 9 || event.getHand() == EquipmentSlot.HAND) && event.hasItem()) {
             ItemStack itemStack = event.getItem();
             Player player = event.getPlayer();
             boolean cancel;
@@ -67,8 +70,8 @@ public class PlayerInvolveEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void playerInventoryClickEvent(InventoryClickEvent event) {
-        Inventory inventory = event.getClickedInventory();
-        if (inventory instanceof PlayerInventory) {
+        Inventory inventory = mcVersion < 8 ? event.getInventory() : event.getClickedInventory();
+        if (mcVersion < 8 ? inventory instanceof CraftingInventory : inventory instanceof PlayerInventory) {
             ItemStack itemStack = event.getCurrentItem();
             if (itemStack != null && itemStack.getType() != Material.AIR) {
                 Player player = (Player) event.getWhoClicked();
@@ -125,6 +128,9 @@ public class PlayerInvolveEventListener implements Listener {
     }
 
     private static boolean isCooling(Player player, String itemID) {
+        if (player.hasPermission("itemcommand.cooldown.bypass")) {
+            return false;
+        }
         HashMap<String, Long> map = cdMap.get(player.getName());
         if (map == null) {
             return false;

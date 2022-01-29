@@ -161,7 +161,8 @@ public class Item {
 
     public boolean charge(Player player) {
         double price = getPrice(player);
-        if (price > 0.0) {
+        boolean priceFree = player.hasPermission("itemcommand.price.free");
+        if (price > 0.0 && !priceFree) {
             if (economy == null) {
                 player.sendMessage(Language.useItemErrorNotEconomy);
             } else if (!economy.has(player, price)) {
@@ -170,7 +171,8 @@ public class Item {
             }
         }
         int points = getPoints(player);
-        if (points > 0) {
+        boolean pointsFree = player.hasPermission("itemcommand.points.free");
+        if (points > 0 && !pointsFree) {
             if (pointsAPI == null) {
                 player.sendMessage(Language.useItemErrorNotPoints);
             } else if (pointsAPI.look(player.getUniqueId()) < points) {
@@ -179,17 +181,18 @@ public class Item {
             }
         }
         int levels = getLevels(player);
-        if (levels > 0 && player.getLevel() < levels) {
+        boolean levelsFree = player.hasPermission("itemcommand.levels.free");
+        if (levels > 0 && !levelsFree && player.getLevel() < levels) {
             player.sendMessage(Language.replaceArgs(Language.useItemNotEnoughLevels, levels));
             return false;
         }
-        if (price > 0.0 && economy != null) {
+        if (price > 0.0 && !priceFree && economy != null) {
             economy.withdrawPlayer(player, price);
         }
-        if (points > 0 && pointsAPI != null) {
+        if (points > 0 && !pointsFree && pointsAPI != null) {
             pointsAPI.take(player.getUniqueId(), points);
         }
-        if (levels > 0) {
+        if (levels > 0 && !levelsFree) {
             player.setLevel(player.getLevel() - levels);
         }
         return true;

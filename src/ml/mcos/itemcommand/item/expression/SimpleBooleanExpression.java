@@ -13,6 +13,15 @@ public class SimpleBooleanExpression implements Expression {
             operator = "!";
             expression = expression.substring(1);
         }
+        /*
+        if (expression.indexOf(',') == -1) {
+            value = expression;
+            message = null;
+        } else {
+            value = Utils.getTextLeft(expression, ',').trim();
+            message = Utils.getTextRight(expression, ',').trim();
+        }
+        */
         value = Utils.getTextLeft(expression, ',').trim();
         message = Utils.getTextRight(expression, ',').trim();
     }

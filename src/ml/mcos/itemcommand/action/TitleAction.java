@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 
 public class TitleAction extends Action {
     private final boolean all;
+    private final int mcVersion = plugin.getMcVersion();
 
     public TitleAction(String value) {
         this(value, false);
@@ -18,7 +19,7 @@ public class TitleAction extends Action {
 
     @Override
     public void execute(Player player) {
-        if (plugin.getMcVersion() <= 10) {
+        if (mcVersion < 8 || (mcVersion == 8 && plugin.getMcVersionPatch() < 7)) {
             plugin.logMessage(Language.actionExecuteErrorTitleNotSupport);
             return;
         }
@@ -29,21 +30,29 @@ public class TitleAction extends Action {
         }
         if (all) {
             for (Player p : plugin.getServer().getOnlinePlayers()) {
-                int time = Utils.parseInt(plugin.replacePlaceholders(p, args[2]));
-                if (time == -1) {
-                    plugin.logMessage(Language.actionExecuteErrorTitleInvalidTime);
+                if (!sendTitle(p, plugin.replacePlaceholders(p, args[0]), plugin.replacePlaceholders(p, args[1]), Utils.parseInt(plugin.replacePlaceholders(p, args[2])))) {
                     return;
-                } else if (time > 0) {
-                    p.sendTitle(plugin.replacePlaceholders(p, args[0]), plugin.replacePlaceholders(p, args[1]), 10, time * 20, 10);
                 }
             }
         } else {
-            int time = Utils.parseInt(plugin.replacePlaceholders(player, args[2]));
-            if (time == -1) {
-                plugin.logMessage(Language.actionExecuteErrorTitleInvalidTime);
-            } else if (time > 0) {
-                player.sendTitle(plugin.replacePlaceholders(player, args[0]), plugin.replacePlaceholders(player, args[1]), 10, time * 20, 10);
-            }
+            sendTitle(player, plugin.replacePlaceholders(player, args[0]), plugin.replacePlaceholders(player, args[1]), Utils.parseInt(plugin.replacePlaceholders(player, args[2])));
         }
     }
+
+    @SuppressWarnings("deprecation")
+    private boolean sendTitle(Player player, String title, String subtitle, int time) {
+        if (time == -1) {
+            plugin.logMessage(Language.actionExecuteErrorTitleInvalidTime);
+            return false;
+        }
+        if (time > 0) {
+            if (mcVersion > 10) {
+                player.sendTitle(title, subtitle, 10, time * 20, 10);
+            } else {
+                player.sendTitle(title, subtitle);
+            }
+        }
+        return true;
+    }
+
 }
