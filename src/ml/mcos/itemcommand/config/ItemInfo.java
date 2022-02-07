@@ -65,6 +65,8 @@ public class ItemInfo {
             return null;
         }
 
+        boolean loreExact = config.getBoolean(id + ".lore-exact", true);
+
         Material type = null;
         if (typeString != null) {
             try {
@@ -174,7 +176,7 @@ public class ItemInfo {
         String requiredAmount = config.getString(id + ".required-amount");
         String cooldown = config.getString(id + ".cooldown");
 
-        return new Item(id, name, lore, type, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown);
+        return new Item(id, name, lore, loreExact, type, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown);
     }
 
     public static Item matchItem(Player player, ItemStack item, Trigger trigger) {

@@ -121,6 +121,10 @@ public class ICCommand implements TabExecutor {
                         flag = true;
                     }
                 }
+                if (containsIgnoreCase(args, "lore-exact")) {
+                    ItemInfo.config.set(id + ".lore-exact", true);
+                    flag = true;
+                }
                 if (containsIgnoreCase(args, "type")) {
                     ItemInfo.config.set(id + ".type", item.getType().toString());
                     flag = true;
@@ -132,7 +136,7 @@ public class ICCommand implements TabExecutor {
                     ItemInfo.config.set(id + ".trigger", Collections.singletonList("right"));
                 }
                 if (containsIgnoreCase(args, "action")) {
-                    ItemInfo.config.set(id + ".action", Collections.singletonList("example"));
+                    ItemInfo.config.set(id + ".action", Collections.singletonList("cmd: 示例命令"));
                 }
                 if (containsIgnoreCase(args, "price")) {
                     ItemInfo.config.set(id + ".price", 0);
@@ -144,7 +148,7 @@ public class ICCommand implements TabExecutor {
                     ItemInfo.config.set(id + ".levels", 0);
                 }
                 if (containsIgnoreCase(args, "permission")) {
-                    ItemInfo.config.set(id + ".permission", "example");
+                    ItemInfo.config.set(id + ".permission", "示例权限");
                 }
                 if (containsIgnoreCase(args, "required-amount")) {
                     ItemInfo.config.set(id + ".required-amount", 1);

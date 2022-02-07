@@ -23,6 +23,7 @@ public class Item {
     private final String id;
     private final String name;
     private final List<String> lore;
+    private final boolean loreExact;
     private final Material type;
     private final Expression[] condition;
     private final Trigger[] trigger;
@@ -34,10 +35,11 @@ public class Item {
     private final String requiredAmount;
     private final String cooldown;
 
-    public Item(String id, String name, List<String> lore, Material type, Expression[] condition, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
+    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, Expression[] condition, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
         this.id = id;
         this.name = name;
         this.lore = lore;
+        this.loreExact = loreExact;
         this.type = type;
         this.condition = condition;
         this.trigger = trigger;
@@ -58,7 +60,7 @@ public class Item {
         return plugin.replacePlaceholders(player, name);
     }
 
-    public List<String> getLore(Player player) {
+    private List<String> getLore(Player player) {
         for (String s : lore) {
             if (ItemCommand.mayContainPlaceholders(s) || s.indexOf('{') != -1) {
                 ArrayList<String> resultLore = new ArrayList<>(lore.size());
@@ -126,7 +128,14 @@ public class Item {
         if (name != null && (meta == null || !getName(player).equals(meta.getDisplayName()))) {
             return false;
         }
-        return lore.isEmpty() || (meta != null && meta.hasLore() && getLore(player).equals(meta.getLore()));
+        return lore.isEmpty() || (meta != null && meta.hasLore() && compareLore(getLore(player), meta.getLore()));
+    }
+
+    private boolean compareLore(List<String> lore, List<String> anotherLore) {
+        if (loreExact) {
+            return lore.equals(anotherLore);
+        }
+        return anotherLore.containsAll(lore);
     }
 
     public boolean matchCondition(Player player) {

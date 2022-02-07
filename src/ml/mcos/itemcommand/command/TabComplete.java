@@ -16,7 +16,7 @@ public class TabComplete {
 
     static {
         tabListMap.put("ItemCommand", Arrays.asList("add", "give", "list", "reload", "version"));
-        tabListMap.put("ItemCommand.add", Arrays.asList("name", "lore", "type", "condition" ,"trigger", "action", "price", "points", "levels" ,"permission", "required-amount", "cooldown"));
+        tabListMap.put("ItemCommand.add", Arrays.asList("name", "lore", "type", "lore-exact", "condition" ,"trigger", "action", "price", "points", "levels" ,"permission", "required-amount", "cooldown"));
         tabListMap.put("ItemCommand.give", Collections.emptyList());
         for (int i = 1; i <= 64; i++) {
             amountList.add(String.valueOf(i));

@@ -1,6 +1,6 @@
 name: ItemCommand
 main: ml.mcos.itemcommand.ItemCommand
-version: 1.0.0
+version: 1.0.1
 api-version: 1.13
 author: myunco
 softdepend:
