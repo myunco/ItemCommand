@@ -31,26 +31,31 @@ public class PlayerInvolveEventListener implements Listener {
         if ((mcVersion < 9 || event.getHand() == EquipmentSlot.HAND) && event.hasItem()) {
             ItemStack itemStack = event.getItem();
             Player player = event.getPlayer();
-            boolean cancel;
+            boolean leftEvent = false;
             Item item;
             switch (event.getAction()) {
                 case LEFT_CLICK_AIR:
                 case LEFT_CLICK_BLOCK:
                     item = ItemInfo.matchItem(player, itemStack, Trigger.LEFT);
-                    cancel = Config.cancelLeftEvent;
+                    leftEvent = true;
                     break;
                 case RIGHT_CLICK_AIR:
                 case RIGHT_CLICK_BLOCK:
                     item = ItemInfo.matchItem(player, itemStack, Trigger.RIGHT);
-                    cancel = Config.cancelRightEvent;
                     break;
                 default:
-                    cancel = false;
                     item = null;
             }
             if (item != null && useItem(player, item, itemStack, player.getInventory().getHeldItemSlot())) {
-                if (!event.isCancelled() && cancel) {
-                    event.setCancelled(true);
+                if (leftEvent) {
+                    //event.setCancelled(Config.cancelLeftEvent); 这样可能会导致本来已经取消的事件被设为不取消
+                    if (Config.cancelLeftEvent) {
+                        event.setCancelled(true);
+                    }
+                } else {
+                    if (Config.cancelRightEvent) {
+                        event.setCancelled(true);
+                    }
                 }
             }
         }
@@ -62,8 +67,8 @@ public class PlayerInvolveEventListener implements Listener {
         ItemStack itemStack = player.getInventory().getItem(event.getNewSlot());
         if (itemStack != null) {
             Item item = ItemInfo.matchItem(player, itemStack, Trigger.HELD);
-            if (item != null && useItem(player, item, itemStack, event.getNewSlot()) && Config.cancelHeldEvent) {
-                event.setCancelled(true);
+            if (item != null && useItem(player, item, itemStack, event.getNewSlot())) {
+                event.setCancelled(Config.cancelHeldEvent);
             }
         }
     }
@@ -75,25 +80,27 @@ public class PlayerInvolveEventListener implements Listener {
             ItemStack itemStack = event.getCurrentItem();
             if (itemStack != null && itemStack.getType() != Material.AIR) {
                 Player player = (Player) event.getWhoClicked();
-                boolean cancel;
+                boolean leftEvent = false;
                 Item item;
                 switch (event.getClick()) {
                     case LEFT:
                     case SHIFT_LEFT:
                         item = ItemInfo.matchItem(player, itemStack, Trigger.INV_LEFT);
-                        cancel = Config.cancelInvLeftEvent;
+                        leftEvent = true;
                         break;
                     case RIGHT:
                     case SHIFT_RIGHT:
                         item = ItemInfo.matchItem(player, itemStack, Trigger.INV_RIGHT);
-                        cancel = Config.cancelInvRightEvent;
                         break;
                     default:
                         item = null;
-                        cancel = false;
                 }
-                if (item != null && useItem(player, item, itemStack, event.getSlot()) && cancel) {
-                    event.setCancelled(true);
+                if (item != null && useItem(player, item, itemStack, event.getSlot())) {
+                    if (leftEvent) {
+                        event.setCancelled(Config.cancelInvLeftEvent);
+                    } else {
+                        event.setCancelled(Config.cancelInvRightEvent);
+                    }
                 }
             }
         }
