@@ -28,14 +28,17 @@ public class TitleAction extends Action {
             plugin.logMessage(Language.actionExecuteErrorTitleArgsError);
             return;
         }
+        String title = plugin.replacePlaceholders(player, args[0]);
+        String subtitle = plugin.replacePlaceholders(player, args[1]);
+        int time = Utils.parseInt(plugin.replacePlaceholders(player, args[2]));
         if (all) {
             for (Player p : plugin.getServer().getOnlinePlayers()) {
-                if (!sendTitle(p, plugin.replacePlaceholders(p, args[0]), plugin.replacePlaceholders(p, args[1]), Utils.parseInt(plugin.replacePlaceholders(p, args[2])))) {
+                if (!sendTitle(p, title, subtitle, time)) {
                     return;
                 }
             }
         } else {
-            sendTitle(player, plugin.replacePlaceholders(player, args[0]), plugin.replacePlaceholders(player, args[1]), Utils.parseInt(plugin.replacePlaceholders(player, args[2])));
+            sendTitle(player, title, subtitle, time);
         }
     }
 

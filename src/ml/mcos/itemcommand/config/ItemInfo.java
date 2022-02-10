@@ -139,6 +139,9 @@ public class ItemInfo {
                     case "sound":
                         action[i] = new SoundAction(actionValue);
                         break;
+                    case "sound-all":
+                        action[i] = new SoundAction(actionValue, true);
+                        break;
                     case "broadcast":
                         action[i] = new BroadcastAction(actionValue);
                         break;

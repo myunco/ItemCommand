@@ -23,13 +23,14 @@ public class ActionBarAction extends Action {
             plugin.logMessage(Language.actionExecuteErrorActionBarNotSupport);
             return;
         }
+        String msg = plugin.replacePlaceholders(player, value);
         try {
             if (all) {
                 for (Player p : plugin.getServer().getOnlinePlayers()) {
-                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(plugin.replacePlaceholders(p, value)));
+                    p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
                 }
             } else {
-                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(plugin.replacePlaceholders(player, value)));
+                player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(msg));
             }
         } catch (Throwable t) {
             plugin.logMessage(Language.actionExecuteErrorActionBarNotSupport);

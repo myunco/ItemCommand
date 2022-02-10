@@ -22,6 +22,7 @@
   lore-exact: true
 
   #匹配物品类型 可选 没有此项则不限物品类型 (虽然name,lore,type都是可选的,但至少要提供一个)
+  #如果你不知道某个物品的类型是什么 可以使用/ic add type命令将物品添加到物品配置文件 即可看到类型
   type: 'PAPER'
 
   #使用物品需要满足的条件 一行一个条件 可选 支持变量 格式为 类型:表达式,不满足条件时显示的消息(不想显示消息的话 只写,即可)
@@ -49,24 +50,26 @@
     - 'right'
 
   #物品使用后执行的动作 一行一个动作 支持变量 可选 没有此项则不执行任何动作
-  #可选的动作有: cmd, op, console, tell, chat, sound, broadcast, give-money, give-points,
+  #可选的动作有: cmd, op, console, tell, chat, sound, sound-all, broadcast, give-money, give-points,
   #  title, title-all, action-bar, action-bar-all, server 不指定默认为cmd
   #格式为 动作: 值 (动作后面需要紧跟一个英文冒号 否则无法识别出正确动作会默认为整行都是cmd动作的值)
   action:
-    #cmd = 让使用物品的玩家执行的命令 命令不需要加 /
+    #cmd = 让使用物品的玩家执行命令 命令不需要加 /
     - 'cmd: help'
-    #op = 让使用物品的玩家以op身份执行的命令 同样不需要加 /
+    #op = 让使用物品的玩家以op身份执行命令 同样不需要加 /
     - 'op: list'
-    #console = 让控制台执行的命令
+    #console = 让控制台执行命令
     - 'console: say hi {player}'
     #tell = 给使用物品的玩家发送消息
     - 'tell: hi {player}'
     #chat = 让使用物品的玩家发送聊天消息
-    - 'chat: 我使用了example'
-    #sound = 给使用物品的玩家播放的音效
+    - 'chat: 我使用了§6示例物品'
+    #sound = 给使用物品的玩家播放指定音效
     - 'sound: ENTITY_EXPERIENCE_ORB_PICKUP'
-    #broadcast = 给全服玩家发送的消息(公告)
-    - 'broadcast: {player}使用了example'
+    #sound-all = 给全服玩家播放指定音效
+    - 'sound-all: ENTITY_EXPERIENCE_ORB_PICKUP'
+    #broadcast = 给全服玩家发送消息(公告)
+    - 'broadcast: {player}使用了§6示例物品'
     #give-money = 给予使用物品的玩家指定数量的钱 只能为正整数 使用此功能需要安装Vault以及支持Vault的经济插件
     - 'give-money: 10'
     #give-points = 给予使用物品的玩家指定数量的点券 只能为正整数 使用此功能需要安装PlayerPoints插件
@@ -74,11 +77,11 @@
     #title = 给使用物品的玩家发送Title消息 格式 标题,副标题,显示时间(秒) 注意 逗号为英文逗号 1.10及以下版本会无视显示时间 1.8以下版本不支持此动作
     - 'title: HiHiHi,没人看得到我 因为会被覆盖,10'
     #title-all = 给全服玩家发送Title消息 格式同上 注意 新的Title会覆盖没显示完的Title 所以这条Title会覆盖掉上面那一条
-    - 'title-all: Hi,{player},10'
+    - 'title-all: Hi,{player}使用了§6示例物品,10'
     #action-bar = 给使用物品的玩家发送ActionBar消息 1.8及以下版本不支持此动作 并且使用此动作需要使用Spigot或其衍生服务端 如Paper
     - 'action-bar: hi 没人看得到我'
     #action-bar-all = 给全服玩家发送ActionBar消息 注意 新的ActionBar会覆盖没显示完的ActionBar 所以这条ActionBar会覆盖掉上面那一条
-    - 'action-bar-all: hi {player}'
+    - 'action-bar-all: {player}使用了§6示例物品'
     #server = 让使用物品的玩家切换到指定的BC子服 如果你不知道这是什么 那么你不需要此功能
     - 'server: login'
 
