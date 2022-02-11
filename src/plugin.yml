@@ -1,6 +1,6 @@
 name: ItemCommand
 main: ml.mcos.itemcommand.ItemCommand
-version: 1.0.3-SNAPSHOT
+version: 1.0.3
 api-version: 1.13
 author: myunco
 softdepend:
@@ -9,7 +9,7 @@ softdepend:
   - PlaceholderAPI
 commands:
   ItemCommand:
-    usage: '§6用法: /ItemCommand §e<§6add§7|§6give§7|§6list§7|§6reload§7|§6version§e>'
+    usage: '§6用法: /ItemCommand §e<§6add§7|§6give§7|§6list§7|§6reload§7|§6type§7|§6version§e>'
     aliases: ic
     permission: itemcommand.admin
     permission-message: '§cYou don''t have permission!'

@@ -61,11 +61,13 @@ public class ItemCommand extends JavaPlugin {
         if (points == null) {
             setupPoints();
         }
-        Plugin papi = getServer().getPluginManager().getPlugin("PlaceholderAPI");
-        enablePAPI = papi != null && papi.isEnabled();
-        if (enablePAPI) {
-            papiVersion = papi.getDescription().getVersion();
-            logMessage("Found PlaceholderAPI: §3v" + papiVersion);
+        if (!enablePAPI) {
+            Plugin papi = getServer().getPluginManager().getPlugin("PlaceholderAPI");
+            enablePAPI = papi != null && papi.isEnabled();
+            if (enablePAPI) {
+                papiVersion = papi.getDescription().getVersion();
+                logMessage("Found PlaceholderAPI: §3v" + papiVersion);
+            }
         }
         ItemInfo.loadItemInfo(this);
     }

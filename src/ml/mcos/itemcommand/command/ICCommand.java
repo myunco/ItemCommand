@@ -45,6 +45,9 @@ public class ICCommand implements TabExecutor {
                 plugin.init();
                 sendMessage(sender, Language.commandReload);
                 break;
+            case "type":
+                commandType(sender);
+                break;
             case "version":
                 sendMessage(sender, Language.replaceArgs(Language.commandVersion, plugin.getDescription().getVersion()));
                 break;
@@ -227,6 +230,20 @@ public class ICCommand implements TabExecutor {
             player.getInventory().addItem(item);
             sendMessage(sender, Language.replaceArgs(Language.commandGive, amount, name == null ? typeString : name, player.getName()));
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void commandType(CommandSender sender) {
+        if (sender instanceof Player) {
+            ItemStack item = plugin.getMcVersion() > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
+            if (item.getType() == Material.AIR) {
+                sendMessage(sender, Language.commandTypeNotItem);
+                return;
+            }
+            sendMessage(sender, Language.replaceArgs(Language.commandType, item.getType()));
+            return;
+        }
+        sendMessage(sender, Language.commandTypeConsole);
     }
 
 }

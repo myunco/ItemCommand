@@ -1,5 +1,5 @@
 #语言文件版本号 请勿修改
-version: 1
+version: 2
 
 log-prefix: '[ItemCommand] '
 message-prefix: '§8[§3ItemCommand§8] '
@@ -18,7 +18,7 @@ load-item-error-not-match: '§4加载 {0} 时出错! name、lore、type 至少�
 load-item-error-unknown-type: '§e加载 {0} 时出错! 未知的物品类型: type: {1}'
 load-item-error-not-found-operator: '§e加载条件时出错! 在条件中未找到运算符: {0}'
 load-item-error-unknown-trigger: '§e加载 {0} 时出错! 未知的触发方式: {1}'
-action-execute-error-sound: '§e错误: 指定的音效 {0} 不存在'
+action-execute-error-sound: '§e错误: 无法执行 sound(-all) 动作! 原因: 指定的音效 {0} 不存在'
 action-execute-error-give-money-not-found-economy: '§e未找到经济插件, 无法执行 give-money 动作!'
 action-execute-error-give-money-not-found-economy-tip: '§e请检查是否正确安装Vault插件以及经济提供插件! (如Essentials、CMI、Economy等)'
 action-execute-error-give-money-invalid-value: '§e错误: 无法执行 give-money 动作! 原因: 无效的数字格式: {0}'
@@ -61,3 +61,6 @@ command-give-invalid-amount: '§c参数错误: 无效的数量: {0}'
 command-give-error-amount: '§c错误: 物品数量不能小于1'
 command-give-invalid-type: '§c错误: 无效的物品类型: {0}'
 command-give: '§a已将§b{0}§a个{1}§a添加到§c{2}§a的物品栏.'
+command-type-not-item: '§d你确定你手里有物品？'
+command-type-console: '§a控制台无法使用此命令。'
+command-type: '§a当前手持物品的类型是: §b{0}'

@@ -72,6 +72,9 @@ public class Language {
     public static String commandGiveErrorAmount;
     public static String commandGiveInvalidType;
     public static String commandGive;
+    public static String commandTypeNotItem;
+    public static String commandTypeConsole;
+    public static String commandType;
 
     public static void loadLanguage(String language) {
         if (language == null || !language.matches("[a-zA-Z]{2}[_-][a-zA-Z]{2}")) {
@@ -100,7 +103,7 @@ public class Language {
         loadItemErrorUnknownType = config.getString("load-item-error-unknown-type", "§e加载 {0} 时出错! 未知的物品类型: type: {1}");
         loadItemErrorNotFoundOperator = config.getString("load-item-error-not-found-operator", "§e加载条件时出错! 在条件中未找到运算符: {0}");
         loadItemErrorUnknownTrigger = config.getString("load-item-error-unknown-trigger", "§e加载 {0} 时出错! 未知的触发方式: {1}");
-        actionExecuteErrorSound = config.getString("action-execute-error-sound", "§e错误: 指定的音效 {0} 不存在");
+        actionExecuteErrorSound = config.getString("action-execute-error-sound", "§e错误: 无法执行 sound(-all) 动作! 原因: 指定的音效 {0} 不存在");
         actionExecuteErrorGiveMoneyNotFoundEconomy = config.getString("action-execute-error-give-money-not-found-economy", "§e未找到经济插件, 无法执行 give-money 动作!");
         actionExecuteErrorGiveMoneyNotFoundEconomyTip = config.getString("action-execute-error-give-money-not-found-economy-tip", "§e请检查是否正确安装Vault插件以及经济提供插件! (如Essentials、CMI、Economy等)");
         actionExecuteErrorGiveMoneyInvalidValue = config.getString("action-execute-error-give-money-invalid-value", "§e错误: 无法执行 give-money 动作! 原因: 无效的数字格式: {0}");
@@ -143,7 +146,9 @@ public class Language {
         commandGiveErrorAmount = config.getString("command-give-error-amount", "§c错误: 物品数量不能小于1");
         commandGiveInvalidType = config.getString("command-give-invalid-type", "§c错误: 无效的物品类型: {0}");
         commandGive = config.getString("command-give", "§a已将§b{0}§a个{1}§a添加到§c{2}§a的物品栏.");
-
+        commandTypeNotItem = config.getString("command-type-not-item", "§d你确定你手里有物品？");
+        commandTypeConsole = config.getString("command-type-console", "§a控制台无法使用此命令。");
+        commandType = config.getString("command-type", "§a当前手持物品的类型是: §b{0}");
     }
 
     private static void saveDefaultLanguage(File lang, String langPath) {
@@ -174,11 +179,22 @@ public class Language {
     }
 
     private static void languageUpdate(YamlConfiguration config, File lang) {
-        int currentVersion = 1;
-        if (version < currentVersion) {
-            //语言文件目前只有一个版本 升级代码暂时不写
-            plugin.getLogger().warning(Language.languageVersionError + Language.version);
-            config.set("version", 1);
+        int latestVersion = 2;
+        if (version < latestVersion) {
+            plugin.logMessage(replaceArgs(languageVersionOutdated, version, latestVersion));
+            switch (version) {
+                case 1:
+                    config.set("command-type-not-item", "§d你确定你手里有物品？");
+                    config.set("command-type-console", "§a控制台无法使用此命令。");
+                    config.set("command-type", "§a当前手持物品的类型是: §b{0}");
+                    break;
+                default:
+                    plugin.logMessage(languageVersionError + version);
+                    return;
+            }
+            plugin.logMessage(languageUpdateComplete);
+            version = latestVersion;
+            config.set("version", latestVersion);
             Config.saveConfiguration(config, lang);
         }
     }
