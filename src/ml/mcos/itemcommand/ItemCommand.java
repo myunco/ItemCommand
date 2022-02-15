@@ -12,6 +12,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -37,6 +38,7 @@ public class ItemCommand extends JavaPlugin {
         PluginCommand command = getCommand("ItemCommand");
         if (command != null) {
             command.setExecutor(new ICCommand(this));
+            command.setTabCompleter((TabCompleter) command.getExecutor());
         }
         Metrics metrics = new Metrics(this, 14020);
         metrics.addCustomChart(new Metrics.SimplePie("economy_plugin", () -> economy == null ? "Not found" : economy.getName()));
