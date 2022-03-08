@@ -35,6 +35,7 @@ public class ItemCommand extends JavaPlugin {
         init();
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getPluginManager().registerEvents(new PlayerInvolveEventListener(), this);
+        //把命令单独抽取到方法里？但就一个命令 是不是不值当的
         PluginCommand command = getCommand("ItemCommand");
         if (command != null) {
             command.setExecutor(new ICCommand(this));
