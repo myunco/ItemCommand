@@ -35,12 +35,7 @@ public class ItemCommand extends JavaPlugin {
         init();
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getPluginManager().registerEvents(new PlayerInvolveEventListener(), this);
-        //把命令单独抽取到方法里？但就一个命令 是不是不值当的
-        PluginCommand command = getCommand("ItemCommand");
-        if (command != null) {
-            command.setExecutor(new ICCommand(this));
-            command.setTabCompleter((TabCompleter) command.getExecutor());
-        }
+        initCommand();
         Metrics metrics = new Metrics(this, 14020);
         metrics.addCustomChart(new Metrics.SimplePie("economy_plugin", () -> economy == null ? "Not found" : economy.getName()));
         metrics.addCustomChart(new Metrics.SimplePie("playerpoints_version", () -> points == null ? "Not found" : points.getDescription().getVersion()));
@@ -73,6 +68,14 @@ public class ItemCommand extends JavaPlugin {
             }
         }
         ItemInfo.loadItemInfo(this);
+    }
+
+    public void initCommand() {
+        PluginCommand command = getCommand("ItemCommand");
+        if (command != null) {
+            command.setExecutor(new ICCommand(this));
+            command.setTabCompleter((TabCompleter) command.getExecutor());
+        }
     }
 
     public static ItemCommand getPlugin() {
