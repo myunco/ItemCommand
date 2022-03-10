@@ -33,9 +33,9 @@ public class ItemCommand extends JavaPlugin {
         mcVersion = getMinecraftVersion();
         getLogger().info("Minecraft version: 1" + mcVersion + mcVersionPatch);
         init();
+        initCommand();
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getPluginManager().registerEvents(new PlayerInvolveEventListener(), this);
-        initCommand();
         Metrics metrics = new Metrics(this, 14020);
         metrics.addCustomChart(new Metrics.SimplePie("economy_plugin", () -> economy == null ? "Not found" : economy.getName()));
         metrics.addCustomChart(new Metrics.SimplePie("playerpoints_version", () -> points == null ? "Not found" : points.getDescription().getVersion()));
