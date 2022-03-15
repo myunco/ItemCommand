@@ -26,7 +26,7 @@ public class ItemCommand extends JavaPlugin {
     private String papiVersion;
     private int mcVersion;
     private int mcVersionPatch;
-    // 3.11打卡 没人反馈bug 我也不想加新功能 没啥可更新的了
+    // 3.15打卡 没人反馈bug 我也不想加新功能 没啥可更新的了
     @Override
     public void onEnable() {
         plugin = this;
