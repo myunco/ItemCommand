@@ -39,6 +39,15 @@ public class Utils {
         int index = text.indexOf(ch);
         return index == -1 ? "" : text.substring(index + 1);
     }
+    public static String getTextLeft1(String text, char ch) {
+        int index = text.lastIndexOf(ch);
+        return index == -1 ? "" : text.substring(0, index);
+    }
+
+    public static String getTextRight1(String text, char ch) {
+        int index = text.lastIndexOf(ch);
+        return index == -1 ? "" : text.substring(index + 1);
+    }
 
     public static String getTextLeft(String text, String s) {
         int index = text.indexOf(s);

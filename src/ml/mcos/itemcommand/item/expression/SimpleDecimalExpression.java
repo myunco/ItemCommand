@@ -18,8 +18,8 @@ public class SimpleDecimalExpression implements Expression {
             plugin.logMessage(Language.replaceArgs(Language.loadItemErrorNotFoundOperator, expression));
         }
         left = Utils.getTextLeft(expression, operator).trim();
-        right = Utils.getTextRight(Utils.getTextLeft(expression, ','), operator).trim();
-        message = Utils.getTextRight(expression, ',').trim();
+        right = Utils.getTextRight(Utils.getTextLeft1(expression, ','), operator).trim();
+        message = Utils.getTextRight1(expression, ',').trim();
     }
 
     @Override

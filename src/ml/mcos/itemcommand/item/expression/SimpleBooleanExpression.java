@@ -22,8 +22,8 @@ public class SimpleBooleanExpression implements Expression {
             message = Utils.getTextRight(expression, ',').trim();
         }
         */
-        value = Utils.getTextLeft(expression, ',').trim();
-        message = Utils.getTextRight(expression, ',').trim();
+        value = Utils.getTextLeft1(expression, ',').trim();
+        message = Utils.getTextRight1(expression, ',').trim();
     }
 
     @Override
