@@ -2,6 +2,7 @@ package ml.mcos.itemcommand.listener;
 
 import ml.mcos.itemcommand.ItemCommand;
 import ml.mcos.itemcommand.config.Config;
+import ml.mcos.itemcommand.config.CooldownInfo;
 import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.item.Item;
@@ -21,10 +22,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 public class PlayerInvolveEventListener implements Listener {
-    private static final HashMap<String, HashMap<String, Long>> cdMap = new HashMap<>();
-    private final int mcVersion = ItemCommand.getPlugin().getMcVersion();
+    public static final HashMap<UUID, HashMap<String, Long>> cdMap = new HashMap<>();
+    private final int mcVersion = ItemCommand.getPlugin().mcVersion;
+
+    public PlayerInvolveEventListener() {
+        CooldownInfo.loadCooldownInfo(cdMap);
+    }
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerInteractEvent(PlayerInteractEvent event) {
@@ -110,7 +116,7 @@ public class PlayerInvolveEventListener implements Listener {
         if (item.matchCondition(player) && item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player, item.getId()) && item.charge(player)) {
             int cooldown = item.getCooldown(player);
             if (cooldown > 0) {
-                putCooldown(player.getName(), item.getId(), cooldown);
+                putCooldown(player.getUniqueId(), item.getId(), cooldown);
             }
             int requiredAmount = item.getRequiredAmount(player);
             if (requiredAmount > 0) {
@@ -130,15 +136,19 @@ public class PlayerInvolveEventListener implements Listener {
         return false;
     }
 
-    private static void putCooldown(String player, String itemID, int cooldown) {
-        cdMap.computeIfAbsent(player, k -> new HashMap<>()).put(itemID, System.currentTimeMillis() + cooldown * 1000L);
+    private static void putCooldown(UUID player, String itemID, int cooldown) {
+        long cdEndTime = System.currentTimeMillis() + cooldown * 1000L;
+        cdMap.computeIfAbsent(player, k -> new HashMap<>()).put(itemID, cdEndTime);
+        if (cooldown > 300) { // 5分钟以上才持久化保存 减少资源消耗
+            CooldownInfo.putCooldownInfo(player.toString(), itemID, cdEndTime);
+        }
     }
 
     private static boolean isCooling(Player player, String itemID) {
         if (player.hasPermission("itemcommand.cooldown.bypass")) {
             return false;
         }
-        HashMap<String, Long> map = cdMap.get(player.getName());
+        HashMap<String, Long> map = cdMap.get(player.getUniqueId());
         if (map == null) {
             return false;
         }

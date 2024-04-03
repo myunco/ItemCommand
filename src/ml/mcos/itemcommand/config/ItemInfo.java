@@ -35,6 +35,7 @@ public class ItemInfo {
     public static final ArrayList<String> idList = new ArrayList<>();
     public static YamlConfiguration config;
     private static File itemsFile;
+    private static final int mcVersion = ItemCommand.getPlugin().mcVersion;
 
     public static void loadItemInfo(ItemCommand plugin) {
         itemsFile = new File(plugin.getDataFolder(), "items.yml");
@@ -63,6 +64,10 @@ public class ItemInfo {
         if (name == null && lore.isEmpty() && typeString == null) {
             plugin.logMessage(Language.replaceArgs(Language.loadItemErrorNotMatch, id));
             return null;
+        }
+        String customModelData = null;
+        if (mcVersion >= 14) {
+            customModelData = config.getString(id + ".customModelData");
         }
 
         boolean loreExact = config.getBoolean(id + ".lore-exact", true);
@@ -179,7 +184,7 @@ public class ItemInfo {
         String requiredAmount = config.getString(id + ".required-amount");
         String cooldown = config.getString(id + ".cooldown");
 
-        return new Item(id, name, lore, loreExact, type, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown);
+        return new Item(id, name, lore, loreExact, type, customModelData, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown);
     }
 
     public static Item matchItem(Player player, ItemStack item, Trigger trigger) {
@@ -193,6 +198,15 @@ public class ItemInfo {
 
     public static void saveConfig() {
         Config.saveConfiguration(config, itemsFile);
+    }
+
+    public static Item getItemById(String id) {
+        for (Item it : items) {
+            if (it.getId().equals(id)) {
+                return it;
+            }
+        }
+        return null;
     }
 
 }

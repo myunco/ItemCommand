@@ -8,14 +8,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class UpdateChecker {
-    public static ItemCommand plugin = ItemCommand.getPlugin();
-    public static String currentVersion = plugin.getDescription().getVersion();
-    public static String[] current = currentVersion.split("\\.");
-    public static Timer timer;
+    private static final ItemCommand plugin = ItemCommand.getPlugin();
+    private static Timer timer;
+    private static String downloadLink;
 
     public static void start() {
         plugin.getServer().getScheduler().runTask(plugin, () -> {
@@ -27,9 +27,10 @@ public class UpdateChecker {
                         CheckResult result = checkVersionUpdate("https://myunco.sinacloud.net/B821CED3/version.txt");
                         if (result.getResultType() == CheckResult.ResultType.SUCCESS) {
                             if (result.hasNewVersion()) {
-                                String str = Language.replaceArgs(Language.updateFoundNewVersion, currentVersion, result.getLatestVersion());
+                                String str = Language.replaceArgs(Language.updateFoundNewVersion, CheckResult.currentVersion, result.getLatestVersion());
                                 plugin.logMessage(result.hasMajorUpdate() ? Language.updateMajorUpdate + str : str);
-                                plugin.logMessage(Language.updateDownloadLink + "https://www.mcbbs.net/thread-1297777-1-1.html");
+                                // plugin.logMessage(Language.updateDownloadLink + "https://www.mcbbs.net/thread-1297777-1-1.html");
+                                plugin.logMessage(Language.updateDownloadLink + downloadLink);
                             }
                         } else {
                             plugin.logMessage(Language.updateCheckFailure + result.getResponseCode());
@@ -39,7 +40,7 @@ public class UpdateChecker {
                         e.printStackTrace();
                     }
                 }
-            }, 14000, 12 * 60 * 60 * 1000);
+            }, 7000, 12 * 60 * 60 * 1000);
         });
     }
 
@@ -53,22 +54,12 @@ public class UpdateChecker {
         HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
         int code = conn.getResponseCode();
         if (code == HttpURLConnection.HTTP_OK) {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
             String latestVersion = reader.readLine();
+            downloadLink = reader.readLine();
             reader.close();
             conn.disconnect();
-            if (currentVersion.equals(latestVersion)) {
-                return new CheckResult(null, false, code, CheckResult.ResultType.SUCCESS);
-            } else {
-                String[] latest = latestVersion.split("\\.");
-                boolean majorUpdate;
-                if (!latest[0].equals(current[0])) {
-                    majorUpdate = true;
-                } else {
-                    majorUpdate = !latest[1].equals(current[1]);
-                }
-                return new CheckResult(latestVersion, majorUpdate, code, CheckResult.ResultType.SUCCESS);
-            }
+            return new CheckResult(latestVersion, code, CheckResult.ResultType.SUCCESS);
         } else {
             return new CheckResult(code, CheckResult.ResultType.FAILURE);
         }

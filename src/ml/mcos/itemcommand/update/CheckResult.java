@@ -1,6 +1,10 @@
 package ml.mcos.itemcommand.update;
 
+import ml.mcos.itemcommand.ItemCommand;
+
 public class CheckResult {
+    public static String currentVersion = ItemCommand.getPlugin().getDescription().getVersion();
+    public static String[] current = currentVersion.replace('-', '.').split("\\.");
 
     public enum ResultType {
         SUCCESS, FAILURE
@@ -9,17 +13,39 @@ public class CheckResult {
     private final ResultType resultType;
     private final String latestVersion;
     private final boolean majorUpdate;
+    private final boolean newVersion;
     private final int responseCode;
 
     public CheckResult(int responseCode, ResultType type) {
-        this(null, false, responseCode, type);
+        this(null, responseCode, type);
     }
 
-    public CheckResult(String latestVersion, boolean majorUpdate, int responseCode, ResultType type) {
+    public CheckResult(String latestVersion, int responseCode, ResultType type) {
         this.latestVersion = latestVersion;
-        this.majorUpdate = majorUpdate;
         this.responseCode = responseCode;
         this.resultType = type;
+        if (latestVersion != null && !currentVersion.equals(latestVersion)) {
+            String[] latest = latestVersion.replace('-', '.').split("\\.");
+            if (Integer.parseInt(latest[0]) > Integer.parseInt(current[0])) {
+                newVersion = true;
+                majorUpdate = true;
+                return;
+            } else if (Integer.parseInt(latest[0]) == Integer.parseInt(current[0])) {
+                if (Integer.parseInt(latest[1]) > Integer.parseInt(current[1])) {
+                    newVersion = true;
+                    majorUpdate = true;
+                    return;
+                } else if (Integer.parseInt(latest[1]) == Integer.parseInt(current[1])) {
+                    if (Integer.parseInt(latest[2]) > Integer.parseInt(current[2])) {
+                        newVersion = true;
+                        majorUpdate = false;
+                        return;
+                    }
+                }
+            }
+        }
+        majorUpdate = false;
+        newVersion = false;
     }
 
     public ResultType getResultType() {
@@ -31,7 +57,7 @@ public class CheckResult {
     }
 
     public boolean hasNewVersion() {
-        return latestVersion != null;
+        return newVersion;
     }
 
     public boolean hasMajorUpdate() {

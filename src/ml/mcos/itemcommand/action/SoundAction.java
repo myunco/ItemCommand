@@ -36,7 +36,7 @@ public class SoundAction extends Action {
     }
 
     public Collection<? extends Player> getOnlinePlayers() {
-        if (plugin.getMcVersion() > 7 || (plugin.getMcVersion() == 7 && plugin.getMcVersionPatch() == 10)) {
+        if (plugin.mcVersion > 7 || (plugin.mcVersion == 7 && plugin.mcVersionPatch == 10)) {
             return plugin.getServer().getOnlinePlayers();
         }
         try {

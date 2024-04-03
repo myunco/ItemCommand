@@ -6,7 +6,6 @@ import org.bukkit.entity.Player;
 
 public class TitleAction extends Action {
     private final boolean all;
-    private final int mcVersion = plugin.getMcVersion();
 
     public TitleAction(String value) {
         this(value, false);
@@ -19,7 +18,7 @@ public class TitleAction extends Action {
 
     @Override
     public void execute(Player player) {
-        if (mcVersion < 8 || (mcVersion == 8 && plugin.getMcVersionPatch() < 7)) {
+        if (plugin.mcVersion < 8 || (plugin.mcVersion == 8 && plugin.mcVersionPatch < 7)) {
             plugin.logMessage(Language.actionExecuteErrorTitleNotSupport);
             return;
         }
@@ -49,7 +48,7 @@ public class TitleAction extends Action {
             return false;
         }
         if (time > 0) {
-            if (mcVersion > 10) {
+            if (plugin.mcVersion > 10) {
                 player.sendTitle(title, subtitle, 10, time * 20, 10);
             } else {
                 player.sendTitle(title, subtitle);

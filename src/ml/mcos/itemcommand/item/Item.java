@@ -25,6 +25,7 @@ public class Item {
     private final List<String> lore;
     private final boolean loreExact;
     private final Material type;
+    private final String customModelData;
     private final Expression[] condition;
     private final Trigger[] trigger;
     private final Action[] action;
@@ -35,12 +36,13 @@ public class Item {
     private final String requiredAmount;
     private final String cooldown;
 
-    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, Expression[] condition, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
+    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, String customModelData, Expression[] condition, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
         this.id = id;
         this.name = name;
         this.lore = lore;
         this.loreExact = loreExact;
         this.type = type;
+        this.customModelData = customModelData;
         this.condition = condition;
         this.trigger = trigger;
         this.action = action;
@@ -60,7 +62,7 @@ public class Item {
         return plugin.replacePlaceholders(player, name);
     }
 
-    private List<String> getLore(Player player) {
+    public List<String> getLore(Player player) {
         for (String s : lore) {
             if (ItemCommand.mayContainPlaceholders(s) || s.indexOf('{') != -1) {
                 ArrayList<String> resultLore = new ArrayList<>(lore.size());
@@ -71,6 +73,14 @@ public class Item {
             }
         }
         return lore;
+    }
+
+    public int getCustomModelData() {
+        int customModelData = this.customModelData == null ? 0 : Utils.parseInt(this.customModelData);
+        if (customModelData == -1) {
+            plugin.logMessage("解析" + id + "时出错! 无效的自定义模型数据: customModelData: " + this.customModelData);
+        }
+        return customModelData;
     }
 
     public double getPrice(Player player) {
@@ -131,11 +141,11 @@ public class Item {
         return lore.isEmpty() || (meta != null && meta.hasLore() && compareLore(getLore(player), meta.getLore()));
     }
 
-    private boolean compareLore(List<String> lore, List<String> anotherLore) {
+    private boolean compareLore(List<String> itemLore, List<String> metaLore) {
         if (loreExact) {
-            return lore.equals(anotherLore);
+            return itemLore.equals(metaLore);
         }
-        return anotherLore.containsAll(lore);
+        return metaLore.containsAll(itemLore);
     }
 
     public boolean matchCondition(Player player) {

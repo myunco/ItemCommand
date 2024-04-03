@@ -24,9 +24,9 @@ public class ItemCommand extends JavaPlugin {
     private PlayerPoints points;
     private boolean enablePAPI;
     private String papiVersion;
-    private int mcVersion;
-    private int mcVersionPatch;
-    // 3.15打卡 没人反馈bug 我也不想加新功能 没啥可更新的了
+    public int mcVersion;
+    public int mcVersionPatch;
+
     @Override
     public void onEnable() {
         plugin = this;
@@ -150,14 +150,6 @@ public class ItemCommand extends JavaPlugin {
 
     public void logMessage(String message) {
         getServer().getConsoleSender().sendMessage(Language.logPrefix + message);
-    }
-
-    public int getMcVersion() {
-        return mcVersion;
-    }
-
-    public int getMcVersionPatch() {
-        return mcVersionPatch;
     }
 
 }

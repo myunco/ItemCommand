@@ -3,6 +3,7 @@ package ml.mcos.itemcommand.command;
 import ml.mcos.itemcommand.ItemCommand;
 import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.config.Language;
+import ml.mcos.itemcommand.item.Item;
 import ml.mcos.itemcommand.update.UpdateChecker;
 import ml.mcos.itemcommand.util.Utils;
 import org.bukkit.Material;
@@ -98,7 +99,7 @@ public class ICCommand implements TabExecutor {
     @SuppressWarnings("deprecation")
     private void commandAdd(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
-            ItemStack item = plugin.getMcVersion() > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
+            ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandAddNotItem);
                 return;
@@ -159,6 +160,9 @@ public class ICCommand implements TabExecutor {
                 if (containsIgnoreCase(args, "cooldown")) {
                     ItemInfo.config.set(id + ".cooldown", 0);
                 }
+                if (plugin.mcVersion >= 14 && containsIgnoreCase(args, "customModelData") && meta != null) {
+                    ItemInfo.config.set(id + ".customModelData", meta.getCustomModelData());
+                }
             }
             if (flag) {
                 ItemInfo.saveConfig();
@@ -199,11 +203,10 @@ public class ICCommand implements TabExecutor {
                 sendMessage(sender, Language.commandGiveErrorAmount);
                 return;
             }
-            String name = plugin.replacePlaceholders(player, ItemInfo.config.getString(args[2] + ".name"));
-            List<String> lore = new ArrayList<>();
-            for (String s : ItemInfo.config.getStringList(args[2] + ".lore")) {
-                lore.add(plugin.replacePlaceholders(player, s));
-            }
+            Item it = ItemInfo.getItemById(args[2]);
+            assert it != null;
+            String name = it.getName(player);
+            List<String> lore = it.getLore(player);
             String typeString = ItemInfo.config.getString(args[2] + ".type");
             if (typeString == null) {
                 typeString = args.length == 4 ? "STONE" : args[4];
@@ -216,7 +219,7 @@ public class ICCommand implements TabExecutor {
                 return;
             }
             ItemStack item = new ItemStack(type, amount);
-            if (name != null || !lore.isEmpty()) {
+            if (name != null || !lore.isEmpty() || it.getCustomModelData() != -1) {
                 ItemMeta meta = item.getItemMeta();
                 assert meta != null;
                 if (name != null) {
@@ -224,6 +227,9 @@ public class ICCommand implements TabExecutor {
                 }
                 if (!lore.isEmpty()) {
                     meta.setLore(lore);
+                }
+                if (plugin.mcVersion >= 14 && it.getCustomModelData() != -1) {
+                    meta.setCustomModelData(it.getCustomModelData());
                 }
                 item.setItemMeta(meta);
             }
@@ -235,7 +241,7 @@ public class ICCommand implements TabExecutor {
     @SuppressWarnings("deprecation")
     private void commandType(CommandSender sender) {
         if (sender instanceof Player) {
-            ItemStack item = plugin.getMcVersion() > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
+            ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandTypeNotItem);
                 return;

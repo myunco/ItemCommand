@@ -19,7 +19,7 @@ public class ActionBarAction extends Action {
 
     @Override
     public void execute(Player player) {
-        if (plugin.getMcVersion() < 9) {
+        if (plugin.mcVersion < 9) {
             plugin.logMessage(Language.actionExecuteErrorActionBarNotSupport);
             return;
         }
