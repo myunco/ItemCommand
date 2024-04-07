@@ -151,10 +151,7 @@ public class Item {
     public boolean matchCondition(Player player) {
         for (Expression expression : condition) {
             if (!expression.execute(player)) {
-                String msg = expression.getMessage(player);
-                if (msg != null && !msg.isEmpty()) {
-                    player.sendMessage(msg);
-                }
+                expression.executeAction(player);
                 return false;
             }
         }

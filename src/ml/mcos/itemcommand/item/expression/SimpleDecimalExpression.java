@@ -1,25 +1,28 @@
 package ml.mcos.itemcommand.item.expression;
 
+import ml.mcos.itemcommand.action.Action;
 import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.util.Utils;
 import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 public class SimpleDecimalExpression implements Expression {
     private final String left;
     private final String right;
     private final String operator;
-    private final String message;
+    private final Action[] action;
 
-    public SimpleDecimalExpression(String expression) {
-        operator = getOperator(expression);
+    public SimpleDecimalExpression(String condition) {
+        ArrayList<String> args = Expression.parseCondition(condition);
+        operator = Expression.getOperator(args.get(0));
         if (operator == null) {
-            plugin.logMessage(Language.replaceArgs(Language.loadItemErrorNotFoundOperator, expression));
+            plugin.logMessage(Language.replaceArgs(Language.loadItemErrorNotFoundOperator, args.get(0)));
         }
-        left = Utils.getTextLeft(expression, operator).trim();
-        right = Utils.getTextRight(Utils.getTextLeft1(expression, ','), operator).trim();
-        message = Utils.getTextRight1(expression, ',').trim();
+        left = Utils.getTextLeft(args.get(0), operator).trim();
+        right = Utils.getTextRight(args.get(0), operator).trim();
+        action = Expression.parseAction(args);
     }
 
     @Override
@@ -61,8 +64,10 @@ public class SimpleDecimalExpression implements Expression {
     }
 
     @Override
-    public String getMessage(Player player) {
-        return message;
+    public void executeAction(Player player) {
+        for (Action act : action) {
+            act.execute(player);
+        }
     }
 
 }

@@ -102,7 +102,7 @@ public class Language {
         updateCheckException = config.getString("update-check-exception", "§4检查更新时发生IO异常.");
         loadItemErrorNotMatch = config.getString("load-item-error-not-match", "§e加载 {0} 时出错! name、lore、type 至少需要提供一个, 当前全未提供");
         loadItemErrorUnknownType = config.getString("load-item-error-unknown-type", "§e加载 {0} 时出错! 未知的物品类型: type: {1}");
-        loadItemErrorNotFoundOperator = config.getString("load-item-error-not-found-operator", "§e加载条件时出错! 在条件中未找到运算符: {0}");
+        loadItemErrorNotFoundOperator = config.getString("load-item-error-not-found-operator", "§e加载条件时出错! 在条件表达式中未找到运算符: {0}");
         loadItemErrorUnknownTrigger = config.getString("load-item-error-unknown-trigger", "§e加载 {0} 时出错! 未知的触发方式: {1}");
         actionExecuteErrorSound = config.getString("action-execute-error-sound", "§e错误: 无法执行 sound(-all) 动作! 原因: 指定的音效 {0} 不存在");
         actionExecuteErrorGiveMoneyNotFoundEconomy = config.getString("action-execute-error-give-money-not-found-economy", "§e未找到经济插件, 无法执行 give-money 动作!");

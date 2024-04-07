@@ -123,6 +123,8 @@ public class ItemCommand extends JavaPlugin {
     public String replacePlaceholders(Player player, String text) {
         if (text == null) {
             return null;
+        } else if (text.length() < 3) {
+            return text;
         }
         if (enablePAPI && mayContainPlaceholders(text)) {
             return PlaceholderAPI.setPlaceholders(player, text.indexOf('{') == -1 ? text : text.replace("{player}", player.getName()));

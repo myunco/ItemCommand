@@ -1,35 +1,30 @@
 package ml.mcos.itemcommand.item.expression;
 
-import ml.mcos.itemcommand.util.Utils;
+import ml.mcos.itemcommand.action.Action;
 import org.bukkit.entity.Player;
 
-public class SimpleBooleanExpression implements Expression {
-    private final String value;
-    private String operator;
-    private final String message;
+import java.util.ArrayList;
 
-    public SimpleBooleanExpression(String expression) {
-        if (expression.charAt(0) == '!') {
+public class SimpleBooleanExpression implements Expression {
+    private final String expr;
+    private String operator;
+    private final Action[] action;
+
+    public SimpleBooleanExpression(String condition) {
+        ArrayList<String> args = Expression.parseCondition(condition);
+        if (args.get(0).charAt(0) == '!') {
             operator = "!";
-            expression = expression.substring(1);
-        }
-        /*
-        if (expression.indexOf(',') == -1) {
-            value = expression;
-            message = null;
+            expr = args.get(0).substring(1);
         } else {
-            value = Utils.getTextLeft(expression, ',').trim();
-            message = Utils.getTextRight(expression, ',').trim();
+            expr = args.get(0);
         }
-        */
-        value = Utils.getTextLeft1(expression, ',').trim();
-        message = Utils.getTextRight1(expression, ',').trim();
+        action = Expression.parseAction(args);
     }
 
     @Override
     public boolean execute(Player player) {
         boolean result;
-        switch (plugin.replacePlaceholders(player, value).toLowerCase()) {
+        switch (plugin.replacePlaceholders(player, expr).toLowerCase()) {
             case "true":
             case "yes":
                 result = true;
@@ -41,8 +36,10 @@ public class SimpleBooleanExpression implements Expression {
     }
 
     @Override
-    public String getMessage(Player player) {
-        return message;
+    public void executeAction(Player player) {
+        for (Action act : action) {
+            act.execute(player);
+        }
     }
 
 }

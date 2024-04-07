@@ -96,9 +96,9 @@ public class ICCommand implements TabExecutor {
         return list;
     }
 
-    @SuppressWarnings("deprecation")
     private void commandAdd(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
+            //noinspection deprecation
             ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandAddNotItem);
@@ -219,7 +219,8 @@ public class ICCommand implements TabExecutor {
                 return;
             }
             ItemStack item = new ItemStack(type, amount);
-            if (name != null || !lore.isEmpty() || it.getCustomModelData() != -1) {
+            int customModelData = it.getCustomModelData();
+            if (name != null || !lore.isEmpty() || customModelData > 0) {
                 ItemMeta meta = item.getItemMeta();
                 assert meta != null;
                 if (name != null) {
@@ -228,8 +229,8 @@ public class ICCommand implements TabExecutor {
                 if (!lore.isEmpty()) {
                     meta.setLore(lore);
                 }
-                if (plugin.mcVersion >= 14 && it.getCustomModelData() != -1) {
-                    meta.setCustomModelData(it.getCustomModelData());
+                if (customModelData > 0) {
+                    meta.setCustomModelData(customModelData);
                 }
                 item.setItemMeta(meta);
             }
@@ -238,9 +239,9 @@ public class ICCommand implements TabExecutor {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void commandType(CommandSender sender) {
         if (sender instanceof Player) {
+            //noinspection deprecation
             ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandTypeNotItem);
