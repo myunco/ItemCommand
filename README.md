@@ -15,6 +15,7 @@ You can find official releases in the following places:
 - ~~**MCBBS**: https://www.mcbbs.net/thread-1297777-1-1.html~~
 - **MyForum**: https://myunco.net/thread-8-1-1.html
 - **BaiduNetdisk**: https://pan.baidu.com/s/1EDucwYmKfHi0re1gP0yx6A?pwd=xcpc
+- **Github**: https://github.com/myunco/ItemCommand/releases
 
 How to install? / Installation / Setup
 ---
@@ -25,7 +26,7 @@ How to install? / Installation / Setup
 
 Building
 ---
-After cloning this repository, add [Craftbukkit-1.14.4.jar](https://getbukkit.org/get/CiNKyh4l9MuPHLpovnGSDU2oHT9gCpUc) to dependencies, build the project using IDEA Artifacts.
+After cloning this repository, add [Craftbukkit-1.14.4.jar](https://getbukkit.org/get/CiNKyh4l9MuPHLpovnGSDU2oHT9gCpUc) and lib directory to dependencies, build the project using IDEA Artifacts.
 
 # Acknowledgments
 Thanks to [JetBrains](https://www.jetbrains.com/?from=ServerMonitor) for the [Free Open Source Licenses](https://jb.gg/OpenSourceSupport)
