@@ -4,6 +4,7 @@ version: 1.2.0-SNAPSHOT
 api-version: 1.13
 author: myunco
 website: https://github.com/myunco/ItemCommand
+description: ItemCommand is a versatile Minecraft server plugin that allows you to bind custom actions to any item, enhancing gameplay with RPG elements and personalized item interactions.
 softdepend:
   - Vault
   - PlayerPoints

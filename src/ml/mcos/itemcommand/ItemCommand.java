@@ -3,6 +3,7 @@ package ml.mcos.itemcommand;
 import me.clip.placeholderapi.PlaceholderAPI;
 import ml.mcos.itemcommand.command.ICCommand;
 import ml.mcos.itemcommand.config.Config;
+import ml.mcos.itemcommand.config.CooldownInfo;
 import ml.mcos.itemcommand.config.ItemInfo;
 import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.listener.PlayerInvolveEventListener;
@@ -68,6 +69,7 @@ public class ItemCommand extends JavaPlugin {
             }
         }
         ItemInfo.loadItemInfo(this);
+        CooldownInfo.loadCooldownInfo(PlayerInvolveEventListener.cdMap);
     }
 
     public void initCommand() {

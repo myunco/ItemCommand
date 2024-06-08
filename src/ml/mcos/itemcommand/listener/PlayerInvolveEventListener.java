@@ -28,10 +28,6 @@ public class PlayerInvolveEventListener implements Listener {
     public static final HashMap<UUID, HashMap<String, Long>> cdMap = new HashMap<>();
     private final int mcVersion = ItemCommand.getPlugin().mcVersion;
 
-    public PlayerInvolveEventListener() {
-        CooldownInfo.loadCooldownInfo(cdMap);
-    }
-
     @EventHandler(priority = EventPriority.LOW)
     public void playerInteractEvent(PlayerInteractEvent event) {
         if ((mcVersion < 9 || event.getHand() == EquipmentSlot.HAND) && event.hasItem()) {
@@ -54,7 +50,6 @@ public class PlayerInvolveEventListener implements Listener {
             }
             if (item != null && useItem(player, item, itemStack, player.getInventory().getHeldItemSlot())) {
                 if (leftEvent) {
-                    //event.setCancelled(Config.cancelLeftEvent); 这样可能会导致本来已经取消的事件被设为不取消
                     if (Config.cancelLeftEvent) {
                         event.setCancelled(true);
                     }

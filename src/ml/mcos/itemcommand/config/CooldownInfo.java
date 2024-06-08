@@ -5,6 +5,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -16,7 +17,15 @@ public class CooldownInfo {
     public static void loadCooldownInfo(HashMap<UUID, HashMap<String, Long>> cdMap) {
         cooldownFile = new File(plugin.getDataFolder(), "data/cooldown.yml");
         if (!cooldownFile.exists()) {
-            return;
+            if (!cooldownFile.getParentFile().exists()) {
+                cooldownFile.getParentFile().mkdir();
+            }
+            try {
+                cooldownFile.createNewFile();
+            } catch (IOException e) {
+                plugin.getLogger().severe("Unable to create data/cooldown.yml");
+                return;
+            }
         }
         cooldownInfo = Config.loadConfiguration(cooldownFile);
         for (String uuid : cooldownInfo.getKeys(false)) {
