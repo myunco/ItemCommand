@@ -35,8 +35,9 @@ public class Item {
     private final String permission;
     private final String requiredAmount;
     private final String cooldown;
+    private final String cooldownMessage;
 
-    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, String customModelData, Expression[] condition, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown) {
+    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, String customModelData, Expression[] condition, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown, String cooldownMessage) {
         this.id = id;
         this.name = name;
         this.lore = lore;
@@ -52,6 +53,7 @@ public class Item {
         this.permission = permission;
         this.requiredAmount = requiredAmount;
         this.cooldown = cooldown;
+        this.cooldownMessage = cooldownMessage;
     }
 
     public String getId() {
@@ -119,12 +121,16 @@ public class Item {
         return requiredAmount;
     }
 
-    public int getCooldown(Player player) {
-        int cooldown = this.cooldown == null ? 0 : Utils.parseInt(plugin.replacePlaceholders(player, this.cooldown));
+    public long getCooldown(Player player) {
+        double cooldown = this.cooldown == null ? 0 : Utils.parseDouble(plugin.replacePlaceholders(player, this.cooldown));
         if (cooldown == -1) {
             plugin.logMessage(Language.replaceArgs(Language.useItemErrorCooldown, id, this.cooldown));
         }
-        return cooldown;
+        return (long) (cooldown * 1000);
+    }
+
+    public String getCooldownMessage(Player player) {
+        return cooldownMessage == null ? null : plugin.replacePlaceholders(player, cooldownMessage);
     }
 
     public boolean match(Player player, ItemStack item, Trigger trigger) {

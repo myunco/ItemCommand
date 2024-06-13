@@ -54,6 +54,31 @@ public class ItemInfo {
                 idList.add(id);
             }
         }
+
+        File itemsDir = new File(plugin.getDataFolder(), "items");
+        if (!itemsDir.exists() && !itemsDir.mkdir() || !itemsDir.isDirectory()) {
+            plugin.getLogger().severe("Unable to create items directory!");
+        } else {
+            YamlConfiguration itemConfig = config;
+            for (File file : itemsDir.listFiles()) {
+                config = Config.loadConfiguration(file);
+                if (file.isFile() && file.getName().endsWith(".yml")) {
+                    for (String id : config.getKeys(false)) {
+                        if (idList.contains(id)) {
+                            plugin.getLogger().warning("Duplicate item id: " + id + " in items/" + file.getName());
+                            continue;
+                        }
+                        Item item = loadItem(plugin, id);
+                        if (item != null) {
+                            items.add(item);
+                            idList.add(id);
+                        }
+                    }
+                }
+                // plugin.getLogger().info("Loaded " + items.size() + " items by " + file.getName());
+            }
+            config = itemConfig;
+        }
         plugin.getLogger().info("Loaded " + items.size() + " items.");
     }
 
@@ -183,8 +208,9 @@ public class ItemInfo {
         String permission = config.getString(id + ".permission");
         String requiredAmount = config.getString(id + ".required-amount");
         String cooldown = config.getString(id + ".cooldown");
+        String cooldownMessage = config.getString(id + ".cooldown-message");
 
-        return new Item(id, name, lore, loreExact, type, customModelData, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown);
+        return new Item(id, name, lore, loreExact, type, customModelData, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown, cooldownMessage);
     }
 
     public static Item matchItem(Player player, ItemStack item, Trigger trigger) {

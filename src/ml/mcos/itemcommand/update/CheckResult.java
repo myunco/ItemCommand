@@ -40,6 +40,10 @@ public class CheckResult {
                         newVersion = true;
                         majorUpdate = false;
                         return;
+                    } else if (latest[2].equals(current[2]) && current.length > 3) { //主版本次版本修正号相同 但当前版本不是最终正式版 例如1.0.0-SNAPSHOT
+                        newVersion = true;
+                        majorUpdate = false;
+                        return;
                     }
                 }
             }

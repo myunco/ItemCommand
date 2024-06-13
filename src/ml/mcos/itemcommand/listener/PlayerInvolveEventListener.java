@@ -108,8 +108,8 @@ public class PlayerInvolveEventListener implements Listener {
     }
 
     private static boolean useItem(Player player, Item item, ItemStack itemStack, int slot) {
-        if (item.matchCondition(player) && item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player, item.getId()) && item.charge(player)) {
-            int cooldown = item.getCooldown(player);
+        if (item.matchCondition(player) && item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player, item.getId(), item.getCooldownMessage(player)) && item.charge(player)) {
+            long cooldown = item.getCooldown(player);
             if (cooldown > 0) {
                 putCooldown(player.getUniqueId(), item.getId(), cooldown);
             }
@@ -131,15 +131,15 @@ public class PlayerInvolveEventListener implements Listener {
         return false;
     }
 
-    private static void putCooldown(UUID player, String itemID, int cooldown) {
-        long cdEndTime = System.currentTimeMillis() + cooldown * 1000L;
+    private static void putCooldown(UUID player, String itemID, long cooldown) {
+        long cdEndTime = System.currentTimeMillis() + cooldown;
         cdMap.computeIfAbsent(player, k -> new HashMap<>()).put(itemID, cdEndTime);
-        if (cooldown > 300) { // 5分钟以上才持久化保存 减少资源消耗
+        if (cooldown > 300000) { // 5分钟以上才持久化保存 减少资源消耗
             CooldownInfo.putCooldownInfo(player.toString(), itemID, cdEndTime);
         }
     }
 
-    private static boolean isCooling(Player player, String itemID) {
+    private static boolean isCooling(Player player, String itemID, String cooldownMessage) {
         if (player.hasPermission("itemcommand.cooldown.bypass")) {
             return false;
         }
@@ -155,7 +155,12 @@ public class PlayerInvolveEventListener implements Listener {
         if (time < current) {
             return false;
         }
-        player.sendMessage(Language.replaceArgs(Language.useItemCooling, (int) ((time - current) / 1000)));
+        if (cooldownMessage == null) {
+            cooldownMessage = Language.useItemCooling;
+        } else if (cooldownMessage.equals("none")) {
+            return true;
+        }
+        player.sendMessage(Language.replaceArgs(cooldownMessage, String.format("%.2f", (time - current) / 1000d)));
         return true;
     }
 
