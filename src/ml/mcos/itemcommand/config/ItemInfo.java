@@ -27,6 +27,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +46,7 @@ public class ItemInfo {
         if (!itemsFile.exists()) {
             plugin.saveResource("items.yml", true);
         }
+        saveExampleConfig(plugin);
         config = Config.loadConfiguration(itemsFile);
         if (!items.isEmpty()) {
             items.clear();
@@ -82,6 +87,27 @@ public class ItemInfo {
         plugin.getLogger().info("Loaded " + items.size() + " items.");
     }
 
+    private static void saveExampleConfig(ItemCommand plugin) {
+        File file = new File(plugin.getDataFolder(), "示例配置-" + plugin.getDescription().getVersion() + ".yml");
+        if (!file.exists()) {
+            InputStream in = plugin.getResource("items.yml");
+            if (in != null) {
+                try {
+                    OutputStream out = new FileOutputStream(file);
+                    byte[] buf = new byte[1024];
+                    int len;
+                    while ((len = in.read(buf)) != -1) {
+                        out.write(buf, 0, len);
+                    }
+                    out.close();
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     private static Item loadItem(ItemCommand plugin, String id) {
         String name = config.getString(id + ".name");
         List<String> lore = config.getStringList(id + ".lore");
@@ -100,7 +126,7 @@ public class ItemInfo {
         Material type = null;
         if (typeString != null) {
             try {
-                type = Material.valueOf(typeString);
+                type = Material.valueOf(typeString.toUpperCase());
             } catch (IllegalArgumentException e) {
                 plugin.logMessage(Language.replaceArgs(Language.loadItemErrorUnknownType, id, typeString));
             }
@@ -131,6 +157,7 @@ public class ItemInfo {
         List<String> triggerList = config.getStringList(id + ".trigger");
         if (triggerList.isEmpty()) {
             triggerList.add("right");
+            triggerList.add("sneak_right");
         }
         Trigger[] trigger = new Trigger[triggerList.size()];
         for (int i = 0; i < trigger.length; i++) {
@@ -209,8 +236,9 @@ public class ItemInfo {
         String requiredAmount = config.getString(id + ".required-amount");
         String cooldown = config.getString(id + ".cooldown");
         String cooldownMessage = config.getString(id + ".cooldown-message");
+        boolean enchantment = config.getBoolean(id + ".enchantment");
 
-        return new Item(id, name, lore, loreExact, type, customModelData, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown, cooldownMessage);
+        return new Item(id, name, lore, loreExact, type, customModelData, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown, cooldownMessage, enchantment);
     }
 
     public static Item matchItem(Player player, ItemStack item, Trigger trigger) {

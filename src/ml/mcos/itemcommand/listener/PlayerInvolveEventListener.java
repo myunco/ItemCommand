@@ -8,10 +8,13 @@ import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.item.Item;
 import ml.mcos.itemcommand.item.Trigger;
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
@@ -21,6 +24,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -30,26 +34,37 @@ public class PlayerInvolveEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerInteractEvent(PlayerInteractEvent event) {
-        if ((mcVersion < 9 || event.getHand() == EquipmentSlot.HAND) && event.hasItem()) {
+        if (event.hasItem() && event.getAction() != Action.PHYSICAL) {
             ItemStack itemStack = event.getItem();
             Player player = event.getPlayer();
-            boolean leftEvent = false;
+            boolean leftClick = false;
+            boolean mainHand = mcVersion < 9 || event.getHand() == EquipmentSlot.HAND;
             Item item;
             switch (event.getAction()) {
                 case LEFT_CLICK_AIR:
                 case LEFT_CLICK_BLOCK:
-                    item = ItemInfo.matchItem(player, itemStack, Trigger.LEFT);
-                    leftEvent = true;
+                    if (mainHand) {
+                        item = ItemInfo.matchItem(player, itemStack, player.isSneaking() ? Trigger.SNEAK_LEFT : Trigger.LEFT);
+                    } else {
+                        item = ItemInfo.matchItem(player, itemStack, player.isSneaking() ? Trigger.SNEAK_OFFHAND_LEFT : Trigger.OFFHAND_LEFT);
+                    }
+                    leftClick = true;
                     break;
                 case RIGHT_CLICK_AIR:
                 case RIGHT_CLICK_BLOCK:
-                    item = ItemInfo.matchItem(player, itemStack, Trigger.RIGHT);
+                    if (mainHand) {
+                        item = ItemInfo.matchItem(player, itemStack, player.isSneaking() ? Trigger.SNEAK_RIGHT : Trigger.RIGHT);
+                    } else {
+                        item = ItemInfo.matchItem(player, itemStack, player.isSneaking() ? Trigger.SNEAK_OFFHAND_RIGHT : Trigger.OFFHAND_RIGHT);
+
+                    }
                     break;
                 default:
+                    // 不可能执行的代码
                     item = null;
             }
-            if (item != null && useItem(player, item, itemStack, player.getInventory().getHeldItemSlot())) {
-                if (leftEvent) {
+            if (item != null && useItem(player, item, itemStack, mainHand ? player.getInventory().getHeldItemSlot() : 40)) {
+                if (leftClick) {
                     if (Config.cancelLeftEvent) {
                         event.setCancelled(true);
                     }
@@ -69,7 +84,9 @@ public class PlayerInvolveEventListener implements Listener {
         if (itemStack != null) {
             Item item = ItemInfo.matchItem(player, itemStack, Trigger.HELD);
             if (item != null && useItem(player, item, itemStack, event.getNewSlot())) {
-                event.setCancelled(Config.cancelHeldEvent);
+                if (Config.cancelHeldEvent) {
+                    event.setCancelled(true);
+                }
             }
         }
     }
@@ -85,22 +102,65 @@ public class PlayerInvolveEventListener implements Listener {
                 Item item;
                 switch (event.getClick()) {
                     case LEFT:
-                    case SHIFT_LEFT:
                         item = ItemInfo.matchItem(player, itemStack, Trigger.INV_LEFT);
                         leftEvent = true;
                         break;
+                    case SHIFT_LEFT:
+                        item = ItemInfo.matchItem(player, itemStack, Trigger.INV_SHIFT_LEFT);
+                        leftEvent = true;
+                        break;
                     case RIGHT:
-                    case SHIFT_RIGHT:
                         item = ItemInfo.matchItem(player, itemStack, Trigger.INV_RIGHT);
+                        break;
+                    case SHIFT_RIGHT:
+                        item = ItemInfo.matchItem(player, itemStack, Trigger.INV_SHIFT_RIGHT);
                         break;
                     default:
                         item = null;
                 }
                 if (item != null && useItem(player, item, itemStack, event.getSlot())) {
                     if (leftEvent) {
-                        event.setCancelled(Config.cancelInvLeftEvent);
+                        if (Config.cancelInvLeftEvent) {
+                            event.setCancelled(true);
+                        }
                     } else {
-                        event.setCancelled(Config.cancelInvRightEvent);
+                        if (Config.cancelInvRightEvent) {
+                            event.setCancelled(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+        if (event.getEntityType() == EntityType.PLAYER) {
+            Player player = (Player) event.getEntity();
+            ItemStack stack = player.getInventory().getItemInHand();
+            if (stack.getType() != Material.AIR) {
+                Item item = ItemInfo.matchItem(player, stack, Trigger.HAND_HIT);
+                if (item != null) {
+                    useItem(player, item, stack, player.getInventory().getHeldItemSlot());
+                }
+            }
+            if (mcVersion >= 9) {
+                stack = player.getInventory().getItemInOffHand();
+                if (stack.getType() != Material.AIR) {
+                    Item item = ItemInfo.matchItem(player, stack, Trigger.OFFHAND_HIT);
+                    if (item != null) {
+                        useItem(player, item, stack, 40);
+                    }
+                }
+            }
+            System.out.println("player.getInventory().getArmorContents() = " + Arrays.toString(player.getInventory().getArmorContents()));
+            //TODO 忽略不可能触发的事件
+            for (ItemStack itemStack : player.getInventory().getArmorContents()) {
+                if (itemStack != null && itemStack.getType() != Material.AIR) {
+                    Item item = ItemInfo.matchItem(player, itemStack, Trigger.ARMOR_HIT);
+                    if (item != null) {
+                        useItem(player, item, itemStack, -1);
                     }
                 }
             }
@@ -108,7 +168,7 @@ public class PlayerInvolveEventListener implements Listener {
     }
 
     private static boolean useItem(Player player, Item item, ItemStack itemStack, int slot) {
-        if (item.matchCondition(player) && item.hasPermission(player) && item.hasEnoughAmount(player, itemStack) && !isCooling(player, item.getId(), item.getCooldownMessage(player)) && item.charge(player)) {
+        if (item.hasPermission(player) && !isCooling(player, item.getId(), item.getCooldownMessage(player)) && item.hasEnoughAmount(player, itemStack) && item.matchCondition(player) && item.charge(player)) {
             long cooldown = item.getCooldown(player);
             if (cooldown > 0) {
                 putCooldown(player.getUniqueId(), item.getId(), cooldown);
@@ -118,7 +178,11 @@ public class PlayerInvolveEventListener implements Listener {
                 if (itemStack.getAmount() > requiredAmount) {
                     itemStack.setAmount(itemStack.getAmount() - requiredAmount);
                 } else if (itemStack.getAmount() == requiredAmount) {
-                    player.getInventory().setItem(slot, null);
+                    if (slot == -1) {
+                        player.getInventory().removeItem(itemStack);
+                    } else {
+                        player.getInventory().setItem(slot, null);
+                    }
                 } else {
                     ItemStack is = itemStack.clone();
                     is.setAmount(requiredAmount);

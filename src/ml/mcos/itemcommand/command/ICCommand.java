@@ -10,7 +10,9 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings("deprecation")
 public class ICCommand implements TabExecutor {
     private final ItemCommand plugin;
 
@@ -98,7 +101,6 @@ public class ICCommand implements TabExecutor {
 
     private void commandAdd(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
-            //noinspection deprecation
             ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandAddNotItem);
@@ -207,20 +209,18 @@ public class ICCommand implements TabExecutor {
             assert it != null;
             String name = it.getName(player);
             List<String> lore = it.getLore(player);
-            String typeString = ItemInfo.config.getString(args[2] + ".type");
-            if (typeString == null) {
-                typeString = args.length == 4 ? "STONE" : args[4];
-            }
-            Material type;
-            try {
-                type = Material.valueOf(typeString);
-            } catch (IllegalArgumentException e) {
-                sendMessage(sender, Language.replaceArgs(Language.commandGiveInvalidType, typeString));
-                return;
+            Material type = it.getType();
+            if (type == null) {
+                try {
+                    type = args.length == 4 ? Material.STONE : Material.valueOf(args[4].toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    sendMessage(sender, Language.replaceArgs(Language.commandGiveInvalidType, args[4]));
+                    return;
+                }
             }
             ItemStack item = new ItemStack(type, amount);
             int customModelData = it.getCustomModelData();
-            if (name != null || !lore.isEmpty() || customModelData > 0) {
+            if (name != null || !lore.isEmpty() || customModelData > 0 || it.isEnchantment()) {
                 ItemMeta meta = item.getItemMeta();
                 assert meta != null;
                 if (name != null) {
@@ -232,22 +232,30 @@ public class ICCommand implements TabExecutor {
                 if (customModelData > 0) {
                     meta.setCustomModelData(customModelData);
                 }
+                if (it.isEnchantment()) {
+                    //noinspection DataFlowIssue
+                    meta.addEnchant(Enchantment.getByName("DURABILITY"), 1, false);
+                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                }
                 item.setItemMeta(meta);
             }
             player.getInventory().addItem(item);
-            sendMessage(sender, Language.replaceArgs(Language.commandGive, amount, name == null ? typeString : name, player.getName()));
+            sendMessage(sender, Language.replaceArgs(Language.commandGive, amount, name == null ? "§b" + type : name, player.getName()));
         }
     }
 
     private void commandType(CommandSender sender) {
         if (sender instanceof Player) {
-            //noinspection deprecation
             ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandTypeNotItem);
                 return;
             }
-            sendMessage(sender, Language.replaceArgs(Language.commandType, item.getType()));
+            if (plugin.mcVersion >= 14 && item.getItemMeta() != null && item.getItemMeta().hasCustomModelData()) {
+                sendMessage(sender, Language.replaceArgs(Language.commandType, item.getType() + " (CustomModel:" + item.getItemMeta().getCustomModelData() + ")"));
+            } else {
+                sendMessage(sender, Language.replaceArgs(Language.commandType, item.getType()));
+            }
             return;
         }
         sendMessage(sender, Language.commandTypeConsole);

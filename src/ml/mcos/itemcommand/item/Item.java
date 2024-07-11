@@ -36,8 +36,10 @@ public class Item {
     private final String requiredAmount;
     private final String cooldown;
     private final String cooldownMessage;
+    private final boolean enchantment;
 
-    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, String customModelData, Expression[] condition, Trigger[] trigger, Action[] action, String price, String points, String levels, String permission, String requiredAmount, String cooldown, String cooldownMessage) {
+    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, String customModelData, Expression[] condition, Trigger[] trigger, Action[] action,
+                String price, String points, String levels, String permission, String requiredAmount, String cooldown, String cooldownMessage, boolean enchantment) {
         this.id = id;
         this.name = name;
         this.lore = lore;
@@ -54,6 +56,7 @@ public class Item {
         this.requiredAmount = requiredAmount;
         this.cooldown = cooldown;
         this.cooldownMessage = cooldownMessage;
+        this.enchantment = enchantment;
     }
 
     public String getId() {
@@ -75,6 +78,10 @@ public class Item {
             }
         }
         return lore;
+    }
+
+    public Material getType() {
+        return type;
     }
 
     public int getCustomModelData() {
@@ -131,6 +138,10 @@ public class Item {
 
     public String getCooldownMessage(Player player) {
         return cooldownMessage == null ? null : plugin.replacePlaceholders(player, cooldownMessage);
+    }
+
+    public boolean isEnchantment() {
+        return enchantment;
     }
 
     public boolean match(Player player, ItemStack item, Trigger trigger) {
