@@ -24,7 +24,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -79,13 +78,15 @@ public class PlayerInvolveEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void playerItemHeldEvent(PlayerItemHeldEvent event) {
-        Player player = event.getPlayer();
-        ItemStack itemStack = player.getInventory().getItem(event.getNewSlot());
-        if (itemStack != null) {
-            Item item = ItemInfo.matchItem(player, itemStack, Trigger.HELD);
-            if (item != null && useItem(player, item, itemStack, event.getNewSlot())) {
-                if (Config.cancelHeldEvent) {
-                    event.setCancelled(true);
+        if (ItemInfo.heldEvent) {
+            Player player = event.getPlayer();
+            ItemStack itemStack = player.getInventory().getItem(event.getNewSlot());
+            if (itemStack != null) {
+                Item item = ItemInfo.matchItem(player, itemStack, Trigger.HELD);
+                if (item != null && useItem(player, item, itemStack, event.getNewSlot())) {
+                    if (Config.cancelHeldEvent) {
+                        event.setCancelled(true);
+                    }
                 }
             }
         }
@@ -93,6 +94,9 @@ public class PlayerInvolveEventListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void playerInventoryClickEvent(InventoryClickEvent event) {
+        if (!ItemInfo.inventoryClickEvent) {
+            return;
+        }
         Inventory inventory = mcVersion < 8 ? event.getInventory() : event.getClickedInventory();
         if (mcVersion < 8 ? inventory instanceof CraftingInventory : inventory instanceof PlayerInventory) {
             ItemStack itemStack = event.getCurrentItem();
@@ -136,6 +140,9 @@ public class PlayerInvolveEventListener implements Listener {
     @SuppressWarnings("deprecation")
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void entityDamageByEntityEvent(EntityDamageByEntityEvent event) {
+        if (!ItemInfo.entityDamageEvent) {
+            return;
+        }
         if (event.getEntityType() == EntityType.PLAYER) {
             Player player = (Player) event.getEntity();
             ItemStack stack = player.getInventory().getItemInHand();
@@ -154,8 +161,6 @@ public class PlayerInvolveEventListener implements Listener {
                     }
                 }
             }
-            System.out.println("player.getInventory().getArmorContents() = " + Arrays.toString(player.getInventory().getArmorContents()));
-            //TODO 忽略不可能触发的事件
             for (ItemStack itemStack : player.getInventory().getArmorContents()) {
                 if (itemStack != null && itemStack.getType() != Material.AIR) {
                     Item item = ItemInfo.matchItem(player, itemStack, Trigger.ARMOR_HIT);

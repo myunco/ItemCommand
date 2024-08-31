@@ -40,6 +40,9 @@ public class ItemInfo {
     public static YamlConfiguration config;
     private static File itemsFile;
     private static final int mcVersion = ItemCommand.getPlugin().mcVersion;
+    public static boolean heldEvent;
+    public static boolean inventoryClickEvent;
+    public static boolean entityDamageEvent;
 
     public static void loadItemInfo(ItemCommand plugin) {
         itemsFile = new File(plugin.getDataFolder(), "items.yml");
@@ -84,11 +87,22 @@ public class ItemInfo {
             }
             config = itemConfig;
         }
+        for (Item item : items) {
+            if (!heldEvent && item.triggerContains(Trigger.HELD)) {
+                heldEvent = true;
+            }
+            if (!inventoryClickEvent && item.triggerContains(Trigger.INV_LEFT) || item.triggerContains(Trigger.INV_RIGHT) || item.triggerContains(Trigger.INV_SHIFT_LEFT) || item.triggerContains(Trigger.INV_SHIFT_RIGHT)) {
+                inventoryClickEvent = true;
+            }
+            if (!entityDamageEvent && item.triggerContains(Trigger.ARMOR_HIT) || item.triggerContains(Trigger.OFFHAND_HIT) || item.triggerContains(Trigger.HAND_HIT)) {
+                entityDamageEvent = true;
+            }
+        }
         plugin.getLogger().info("Loaded " + items.size() + " items.");
     }
 
     private static void saveExampleConfig(ItemCommand plugin) {
-        File file = new File(plugin.getDataFolder(), "示例配置-" + plugin.getDescription().getVersion() + ".yml");
+        File file = new File(plugin.getDataFolder(), "示例物品配置-" + plugin.getDescription().getVersion() + ".yml");
         if (!file.exists()) {
             InputStream in = plugin.getResource("items.yml");
             if (in != null) {

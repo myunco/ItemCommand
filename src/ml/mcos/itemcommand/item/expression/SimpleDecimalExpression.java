@@ -66,7 +66,7 @@ public class SimpleDecimalExpression implements Expression {
     @Override
     public void executeAction(Player player) {
         for (Action act : action) {
-            act.execute(player);
+            act.call(player);
         }
     }
 

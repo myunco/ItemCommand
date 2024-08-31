@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Item {
-    private static final ItemCommand plugin = ItemCommand.getPlugin();
+    private final ItemCommand plugin = ItemCommand.getPlugin();
     private final Economy economy = plugin.getEconomy();
     private final PlayerPointsAPI pointsAPI = plugin.getPointsAPI();
 
@@ -87,7 +87,7 @@ public class Item {
     public int getCustomModelData() {
         int customModelData = this.customModelData == null ? 0 : Utils.parseInt(this.customModelData);
         if (customModelData == -1) {
-            plugin.logMessage("解析" + id + "时出错! 无效的自定义模型数据: customModelData: " + this.customModelData);
+            plugin.logMessage("§e解析" + id + "时出错! 无效的自定义模型数据: customModelData: " + this.customModelData);
         }
         return customModelData;
     }
@@ -162,6 +162,7 @@ public class Item {
         if (loreExact) {
             return itemLore.equals(metaLore);
         }
+        //noinspection SlowListContainsAll
         return metaLore.containsAll(itemLore);
     }
 
@@ -175,7 +176,7 @@ public class Item {
         return true;
     }
 
-    private boolean triggerContains(Trigger trigger) {
+    public boolean triggerContains(Trigger trigger) {
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < this.trigger.length; i++) {
             if (this.trigger[i] == trigger) {
@@ -188,7 +189,7 @@ public class Item {
     public void executeAction(Player player) {
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < action.length; i++) {
-            action[i].execute(player);
+            action[i].call(player);
         }
     }
 
