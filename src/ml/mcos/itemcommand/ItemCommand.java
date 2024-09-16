@@ -9,6 +9,7 @@ import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.listener.PlayerInvolveEventListener;
 import ml.mcos.itemcommand.metrics.Metrics;
 import ml.mcos.itemcommand.update.UpdateChecker;
+import ml.mcos.itemcommand.update.UpdateNotification;
 import net.milkbowl.vault.economy.Economy;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
@@ -37,6 +38,9 @@ public class ItemCommand extends JavaPlugin {
         initCommand();
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
         getServer().getPluginManager().registerEvents(new PlayerInvolveEventListener(), this);
+        if (Config.checkUpdate) {
+            getServer().getPluginManager().registerEvents(new UpdateNotification(), this);
+        }
         Metrics metrics = new Metrics(this, 14020);
         metrics.addCustomChart(new Metrics.SimplePie("economy_plugin", () -> economy == null ? "Not found" : economy.getName()));
         metrics.addCustomChart(new Metrics.SimplePie("playerpoints_version", () -> points == null ? "Not found" : points.getDescription().getVersion()));

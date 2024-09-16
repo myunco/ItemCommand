@@ -21,7 +21,7 @@ public class CheckResult {
     private String latestVersion;
     private String errorMessage;
 
-    enum ResultType {
+    public enum ResultType {
         SUCCESS, FAILURE
     }
 
@@ -60,6 +60,8 @@ public class CheckResult {
                                 if (line.endsWith("SNAPSHOT") || line.endsWith("BETA")) {
                                     continue;
                                 }
+                            } else if (line.startsWith("//")) {
+                                continue;
                             }
                             updateInfo.append(line).append('\n');
                         }
@@ -108,7 +110,7 @@ public class CheckResult {
         newVersion = false;
     }
 
-    public CheckResult.ResultType getResultType() {
+    public ResultType getResultType() {
         return resultType;
     }
 
