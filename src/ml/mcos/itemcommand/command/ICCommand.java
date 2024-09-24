@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@SuppressWarnings("deprecation")
 public class ICCommand implements TabExecutor {
     private final ItemCommand plugin;
 
@@ -99,6 +98,7 @@ public class ICCommand implements TabExecutor {
         return list;
     }
 
+    @SuppressWarnings("deprecation")
     private void commandAdd(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
             ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
@@ -184,6 +184,7 @@ public class ICCommand implements TabExecutor {
         return false;
     }
 
+    @SuppressWarnings("deprecation")
     private void commandGive(CommandSender sender, String[] args) {
         if (args.length < 4) {
             sendMessage(sender, Language.commandGiveUsage);
@@ -244,6 +245,7 @@ public class ICCommand implements TabExecutor {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void commandType(CommandSender sender) {
         if (sender instanceof Player) {
             ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();

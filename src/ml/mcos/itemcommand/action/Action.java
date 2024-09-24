@@ -1,6 +1,7 @@
 package ml.mcos.itemcommand.action;
 
 import ml.mcos.itemcommand.ItemCommand;
+import ml.mcos.itemcommand.config.Language;
 import ml.mcos.itemcommand.util.Utils;
 import org.bukkit.entity.Player;
 
@@ -22,21 +23,22 @@ public class Action {
         if (v.length > 1) {
             delay = Utils.parseInt(v[1]);
             if (delay == -1) {
-                plugin.logMessage("§e解析动作时出错! 在延时中发现无效数字: " + v[1]);
+                plugin.logMessage(Language.replaceArgs(Language.actionParseErrorDelay, v[1]));
             }
             if (v.length > 2) {
                 if (v[2].indexOf(':') == -1) {
                     probability = Utils.parseInt(v[2]);
                     if (probability == -1) {
-                        plugin.logMessage("§e解析动作时出错! 在概率中发现无效数字: " + v[2]);
+                        plugin.logMessage(Language.replaceArgs(Language.actionParseErrorProbability, v[2]));
                     }
                 } else {
                     probability = Utils.parseInt(Utils.getTextLeft(v[2], ':'));
                     if (probability == -1) {
-                        plugin.logMessage("§e解析动作时出错! 在概率中发现无效数字: " + v[2]);
-                    }seed = Utils.parseInt(Utils.getTextRight(v[2], ':'));
+                        plugin.logMessage(Language.replaceArgs(Language.actionParseErrorProbability, v[2]));
+                    }
+                    seed = Utils.parseInt(Utils.getTextRight(v[2], ':'));
                     if (probability == -1) {
-                        plugin.logMessage("§e解析动作时出错! 在种子中发现无效数字: " + v[2]);
+                        plugin.logMessage(Language.replaceArgs(Language.actionParseErrorSeed, v[2]));
                     }
                 }
             }

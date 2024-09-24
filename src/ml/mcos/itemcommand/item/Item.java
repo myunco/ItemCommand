@@ -87,7 +87,7 @@ public class Item {
     public int getCustomModelData() {
         int customModelData = this.customModelData == null ? 0 : Utils.parseInt(this.customModelData);
         if (customModelData == -1) {
-            plugin.logMessage("§e解析" + id + "时出错! 无效的自定义模型数据: customModelData: " + this.customModelData);
+            plugin.logMessage(Language.replaceArgs(Language.commandGiveErrorModel, id, this.customModelData));
         }
         return customModelData;
     }

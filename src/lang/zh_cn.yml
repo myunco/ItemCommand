@@ -1,5 +1,5 @@
 #语言文件版本号 请勿修改
-version: 2
+version: 3
 
 log-prefix: '[ItemCommand] '
 message-prefix: '§8[§3ItemCommand§8] '
@@ -29,6 +29,9 @@ action-execute-error-title-args-error: '§e错误: 无法执行 title(-all) 动�
 action-execute-error-title-not-support: '§e错误: 无法执行 title(-all) 动作! 原因: 当前服务端不支持此操作'
 action-execute-error-title-invalid-time: '§e错误: 无法执行 title(-all) 动作! 原因: 无效的显示时间: {0}'
 action-execute-error-action-bar-not-support: '§e错误: 无法执行 action-bar(-all) 动作! 原因: 当前服务端不支持此操作'
+action-parse-error-delay: '§e解析动作时出错! 在延时中发现无效数字: {0}'
+action-parse-error-probability: '§e解析动作时出错! 在概率中发现无效数字: {0}'
+action-parse-error-seed: '§e解析动作时出错! 在种子中发现无效数字: {0}'
 use-item-cooling: '§4使用冷却: §c{0}§4秒。'
 use-item-condition-invalid-number: '§e解析条件时出错! 在数值比较表达式中发现无效数字: {0}'
 use-item-error-price: '§e解析 {0} 时出错! 无效的花费: price: {1}'
@@ -59,6 +62,7 @@ command-give-not-found-player: '§c指定的玩家不在线或不存在！'
 command-give-not-found-id: '§c指定的ID不存在或未能正确加载。'
 command-give-invalid-amount: '§c参数错误: 无效的数量: {0}'
 command-give-error-amount: '§c错误: 物品数量不能小于1'
+command-give-error-model: '§e解析 {0} 时出错! 无效的自定义模型数据: customModelData: {1}'
 command-give-invalid-type: '§c错误: 无效的物品类型: {0}'
 command-give: '§a已将§b{0}§a个{1}§a添加到§c{2}§a的物品栏.'
 command-type-not-item: '§d你确定你手里有物品？'

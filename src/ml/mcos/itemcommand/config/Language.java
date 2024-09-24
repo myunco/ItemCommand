@@ -40,6 +40,9 @@ public class Language {
     public static String actionExecuteErrorTitleNotSupport;
     public static String actionExecuteErrorTitleInvalidTime;
     public static String actionExecuteErrorActionBarNotSupport;
+    public static String actionParseErrorDelay;
+    public static String actionParseErrorProbability;
+    public static String actionParseErrorSeed;
     public static String useItemCooling;
     public static String useItemConditionInvalidNumber;
     public static String useItemErrorPrice;
@@ -70,6 +73,7 @@ public class Language {
     public static String commandGiveNotFoundId;
     public static String commandGiveInvalidAmount;
     public static String commandGiveErrorAmount;
+    public static String commandGiveErrorModel;
     public static String commandGiveInvalidType;
     public static String commandGive;
     public static String commandTypeNotItem;
@@ -115,6 +119,9 @@ public class Language {
         actionExecuteErrorTitleNotSupport = config.getString("action-execute-error-title-not-support", "§e错误: 无法执行 title(-all) 动作! 原因: 当前服务端不支持此操作");
         actionExecuteErrorTitleInvalidTime = config.getString("action-execute-error-title-invalid-time", "§e错误: 无法执行 title(-all) 动作! 原因: 无效的显示时间: {0}");
         actionExecuteErrorActionBarNotSupport = config.getString("action-execute-error-action-bar-not-support", "§e错误: 无法执行 action-bar(-all) 动作! 原因: 当前服务端不支持此操作");
+        actionParseErrorDelay = config.getString("action-parse-error-delay", "§e解析动作时出错! 在延时中发现无效数字: {0}");
+        actionParseErrorProbability = config.getString("action-parse-error-probability", "§e解析动作时出错! 在概率中发现无效数字: {0}");
+        actionParseErrorSeed = config.getString("action-parse-error-seed", "§e解析动作时出错! 在种子中发现无效数字: {0}");
         useItemCooling = config.getString("use-item-cooling", "§4使用冷却: §c{0}§4秒。");
         useItemConditionInvalidNumber = config.getString("use-item-condition-invalid-number", "§e解析条件时出错! 在数值比较表达式中发现无效数字: {0}");
         useItemErrorPrice = config.getString("use-item-error-price", "§e解析 {0} 时出错! 无效的花费: price: {1}");
@@ -145,6 +152,7 @@ public class Language {
         commandGiveNotFoundId = config.getString("command-give-not-found-id", "§c指定的ID不存在或未能正确加载。");
         commandGiveInvalidAmount = config.getString("command-give-invalid-amount", "§c参数错误: 无效的数量: {0}");
         commandGiveErrorAmount = config.getString("command-give-error-amount", "§c错误: 物品数量不能小于1");
+        commandGiveErrorModel = config.getString("command-give-error-model", "§e解析 {0} 时出错! 无效的自定义模型数据: customModelData: {1}");
         commandGiveInvalidType = config.getString("command-give-invalid-type", "§c错误: 无效的物品类型: {0}");
         commandGive = config.getString("command-give", "§a已将§b{0}§a个{1}§a添加到§c{2}§a的物品栏.");
         commandTypeNotItem = config.getString("command-type-not-item", "§d你确定你手里有物品？");
@@ -180,7 +188,7 @@ public class Language {
     }
 
     private static void languageUpdate(YamlConfiguration config, File lang) {
-        int latestVersion = 2;
+        int latestVersion = 3;
         if (version < latestVersion) {
             plugin.logMessage(replaceArgs(languageVersionOutdated, version, latestVersion));
             switch (version) {
@@ -188,6 +196,11 @@ public class Language {
                     config.set("command-type-not-item", "§d你确定你手里有物品？");
                     config.set("command-type-console", "§a控制台无法使用此命令。");
                     config.set("command-type", "§a当前手持物品的类型是: §b{0}");
+                case 2:
+                    config.set("command-give-error-model", "§e解析 {0} 时出错! 无效的自定义模型数据: customModelData: {1}");
+                    config.set("action-parse-error-delay", "§e解析动作时出错! 在延时中发现无效数字: {0}");
+                    config.set("action-parse-error-probability", "§e解析动作时出错! 在概率中发现无效数字: {0}");
+                    config.set("action-parse-error-seed", "§e解析动作时出错! 在种子中发现无效数字: {0}");
                     break;
                 default:
                     plugin.logMessage(languageVersionError + version);

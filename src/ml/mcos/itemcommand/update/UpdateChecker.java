@@ -28,7 +28,7 @@ public class UpdateChecker {
                             downloadLink = Language.updateDownloadLink + result.getDownloadLink();
                             plugin.logMessage(newVersion);
                             plugin.logMessage(downloadLink);
-                            plugin.logMessage("§c更新日志：" + result.getUpdateInfo());
+                            plugin.logMessage(result.getUpdateInfo());
                         } else {
                             isUpdateAvailable = false;
                         }
