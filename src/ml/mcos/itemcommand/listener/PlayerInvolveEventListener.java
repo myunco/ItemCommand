@@ -195,9 +195,8 @@ public class PlayerInvolveEventListener implements Listener {
                 }
             }
             item.executeAction(player);
-            return true;
         }
-        return false;
+        return true;
     }
 
     private static void putCooldown(UUID player, String itemID, long cooldown) {
