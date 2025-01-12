@@ -83,7 +83,6 @@ public class ItemInfo {
                         }
                     }
                 }
-                // plugin.getLogger().info("Loaded " + items.size() + " items by " + file.getName());
             }
             config = itemConfig;
         }
@@ -130,9 +129,13 @@ public class ItemInfo {
             plugin.logMessage(Language.replaceArgs(Language.loadItemErrorNotMatch, id));
             return null;
         }
-        String customModelData = null;
+        int customModelData = 0;
         if (mcVersion >= 14) {
-            customModelData = config.getString(id + ".customModelData");
+            if (config.contains(id + ".custom-model-data")) {
+                customModelData = config.getInt(id + ".custom-model-data", 0);
+            } else { //兼容旧版本命名
+                customModelData = config.getInt(id + ".customModelData", 0);
+            }
         }
 
         boolean loreExact = config.getBoolean(id + ".lore-exact", true);

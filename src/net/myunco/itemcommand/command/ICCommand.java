@@ -162,8 +162,8 @@ public class ICCommand implements TabExecutor {
                 if (containsIgnoreCase(args, "cooldown")) {
                     ItemInfo.config.set(id + ".cooldown", 0);
                 }
-                if (plugin.mcVersion >= 14 && containsIgnoreCase(args, "customModelData") && meta != null) {
-                    ItemInfo.config.set(id + ".customModelData", meta.getCustomModelData());
+                if (plugin.mcVersion >= 14 && containsIgnoreCase(args, "custom-model-data") && meta != null) {
+                    ItemInfo.config.set(id + ".custom-model-data", meta.getCustomModelData());
                 }
             }
             if (flag) {

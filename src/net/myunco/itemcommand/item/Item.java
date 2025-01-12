@@ -25,7 +25,7 @@ public class Item {
     private final List<String> lore;
     private final boolean loreExact;
     private final Material type;
-    private final String customModelData;
+    private final int customModelData;
     private final Expression[] condition;
     private final Trigger[] trigger;
     private final Action[] action;
@@ -38,7 +38,7 @@ public class Item {
     private final String cooldownMessage;
     private final boolean enchantment;
 
-    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, String customModelData, Expression[] condition, Trigger[] trigger, Action[] action,
+    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, int customModelData, Expression[] condition, Trigger[] trigger, Action[] action,
                 String price, String points, String levels, String permission, String requiredAmount, String cooldown, String cooldownMessage, boolean enchantment) {
         this.id = id;
         this.name = name;
@@ -85,11 +85,10 @@ public class Item {
     }
 
     public int getCustomModelData() {
-        int customModelData = this.customModelData == null ? 0 : Utils.parseInt(this.customModelData);
-        if (customModelData == -1) {
+        if (this.customModelData < 0) {
             plugin.logMessage(Language.replaceArgs(Language.commandGiveErrorModel, id, this.customModelData));
         }
-        return customModelData;
+        return this.customModelData;
     }
 
     public double getPrice(Player player) {
