@@ -6,7 +6,9 @@ import net.myunco.itemcommand.config.Language;
 import net.myunco.itemcommand.item.Item;
 import net.myunco.itemcommand.update.UpdateChecker;
 import net.myunco.itemcommand.util.Utils;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -16,9 +18,10 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ICCommand implements TabExecutor {
     private final ItemCommand plugin;
@@ -67,13 +70,6 @@ public class ICCommand implements TabExecutor {
     @Override
     @SuppressWarnings("NullableProblems")
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-        if (sender instanceof Player) {
-            if (args.length > 1 && args[0].equalsIgnoreCase("add")) {
-                ArrayList<String> list = new ArrayList<>(TabComplete.tabListMap.get("ItemCommand.add"));
-                list.removeAll(mergeArgs(args));
-                return list.isEmpty() ? list : TabComplete.getCompleteList(args, list);
-            }
-        }
         if (args[0].equalsIgnoreCase("give")) {
             switch (args.length) {
                 case 3:
@@ -87,17 +83,6 @@ public class ICCommand implements TabExecutor {
         return TabComplete.getCompleteList(args, TabComplete.getTabList(args, command.getName()));
     }
 
-    private static ArrayList<String> mergeArgs(String[] args) {
-        ArrayList<String> list = new ArrayList<>();
-        for (int i = 1; i < args.length; i++) {
-            if (args[i].isEmpty()) {
-                continue;
-            }
-            list.add(args[i]);
-        }
-        return list;
-    }
-
     @SuppressWarnings("deprecation")
     private void commandAdd(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
@@ -106,87 +91,56 @@ public class ICCommand implements TabExecutor {
                 sendMessage(sender, Language.commandAddNotItem);
                 return;
             }
-            boolean def = args.length == 1;
-            boolean flag = false;
             ItemMeta meta = item.getItemMeta();
-            String id = String.valueOf(System.currentTimeMillis());
-            if (def || containsIgnoreCase(args, "name")) {
-                if (meta == null || !meta.hasDisplayName()) {
-                    sendMessage(sender, Language.commandAddNotName);
-                } else {
-                    ItemInfo.config.set(id + ".name", meta.getDisplayName());
-                    flag = true;
+            assert meta != null; //只有Material.AIR的meta是null
+            String id;
+            if (args.length > 1) {
+                if (args[1].indexOf('.') != -1) {
+                    sendMessage(sender, Language.commandAddInvalidId);
+                    return;
+                } else if (ItemInfo.idList.contains(args[1])) {
+                    sendMessage(sender, Language.commandAddIdExist);
+                    return;
                 }
+                id = args[1];
+            } else {
+                id = String.valueOf(System.currentTimeMillis());
             }
-            if (!def) {
-                if (containsIgnoreCase(args, "lore")) {
-                    if (meta == null || !meta.hasLore()) {
-                        sendMessage(sender, Language.commandAddNotLore);
-                    } else {
-                        ItemInfo.config.set(id + ".lore", meta.getLore());
-                        flag = true;
-                    }
-                }
-                if (containsIgnoreCase(args, "lore-exact")) {
-                    ItemInfo.config.set(id + ".lore-exact", true);
-                    flag = true;
-                }
-                if (containsIgnoreCase(args, "type")) {
-                    ItemInfo.config.set(id + ".type", item.getType().toString());
-                    flag = true;
-                }
-                if (containsIgnoreCase(args, "condition")) {
-                    ItemInfo.config.set(id + ".condition", Collections.singletonList("true,"));
-                }
-                if (containsIgnoreCase(args, "trigger")) {
-                    ItemInfo.config.set(id + ".trigger", Collections.singletonList("right"));
-                }
-                if (containsIgnoreCase(args, "action")) {
-                    ItemInfo.config.set(id + ".action", Collections.singletonList("cmd: 示例命令"));
-                }
-                if (containsIgnoreCase(args, "price")) {
-                    ItemInfo.config.set(id + ".price", 0);
-                }
-                if (containsIgnoreCase(args, "points")) {
-                    ItemInfo.config.set(id + ".points", 0);
-                }
-                if (containsIgnoreCase(args, "levels")) {
-                    ItemInfo.config.set(id + ".levels", 0);
-                }
-                if (containsIgnoreCase(args, "permission")) {
-                    ItemInfo.config.set(id + ".permission", "示例权限");
-                }
-                if (containsIgnoreCase(args, "required-amount")) {
-                    ItemInfo.config.set(id + ".required-amount", 1);
-                }
-                if (containsIgnoreCase(args, "cooldown")) {
-                    ItemInfo.config.set(id + ".cooldown", 0);
-                }
-                if (plugin.mcVersion >= 14 && containsIgnoreCase(args, "custom-model-data") && meta != null) {
-                    ItemInfo.config.set(id + ".custom-model-data", meta.getCustomModelData());
-                }
+            if (!meta.hasDisplayName()) {
+                sendMessage(sender, Language.commandAddNotName);
+            } else {
+                ItemInfo.config.set(id + ".name", meta.getDisplayName());
             }
-            if (flag) {
-                ItemInfo.saveConfig();
-                sendMessage(sender, Language.replaceArgs(Language.commandAdd, id));
+            if (!meta.hasLore()) {
+                sendMessage(sender, Language.commandAddNotLore);
+            } else {
+                ItemInfo.config.set(id + ".lore", meta.getLore());
             }
+            ItemInfo.config.set(id + ".lore-exact", true);
+            ItemInfo.config.set(id + ".type", item.getType().toString());
+            if (plugin.mcVersion >= 14) {
+                ItemInfo.config.set(id + ".custom-model-data", meta.getCustomModelData());
+            }
+            ItemInfo.config.set(id + ".condition", Collections.singletonList("true"));
+            ItemInfo.config.set(id + ".trigger", Collections.singletonList("right"));
+            ItemInfo.config.set(id + ".action", Collections.singletonList("cmd: help"));
+            ItemInfo.config.set(id + ".price", 0);
+            ItemInfo.config.set(id + ".points", 0);
+            ItemInfo.config.set(id + ".levels", 0);
+            ItemInfo.config.set(id + ".permission", "");
+            ItemInfo.config.set(id + ".required-amount", 1);
+            ItemInfo.config.set(id + ".cooldown", 0);
+            ItemInfo.config.set(id + ".cooldown-message", "");
+            ItemInfo.saveConfig();
+            sendMessage(sender, Language.replaceArgs(Language.commandAdd, id));
             return;
         }
         sendMessage(sender, Language.commandAddConsole);
     }
 
-    private boolean containsIgnoreCase(String[] array, String ele) {
-        for (String s : array) {
-            if (s.equalsIgnoreCase(ele)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     @SuppressWarnings("deprecation")
     private void commandGive(CommandSender sender, String[] args) {
-        if (args.length < 4) {
+        if (args.length < 3) {
             sendMessage(sender, Language.commandGiveUsage);
             sendMessage(sender, Language.commandGiveTip1);
             sendMessage(sender, Language.commandGiveTip2);
@@ -198,22 +152,21 @@ public class ICCommand implements TabExecutor {
         } else if (!ItemInfo.idList.contains(args[2])) {
             sendMessage(sender, Language.commandGiveNotFoundId);
         } else {
-            int amount = Utils.parseInt(args[3]);
+            int amount = args.length == 3 ? 1 : Utils.parseInt(args[3]);
             if (amount == -1) {
-                sendMessage(sender, Language.replaceArgs(Language.commandGiveInvalidAmount, amount));
+                sendMessage(sender, Language.replaceArgs(Language.commandGiveInvalidAmount, args[3]));
                 return;
             } else if (amount == 0) {
                 sendMessage(sender, Language.commandGiveErrorAmount);
                 return;
             }
             Item it = ItemInfo.getItemById(args[2]);
-            assert it != null;
             String name = it.getName(player);
             List<String> lore = it.getLore(player);
             Material type = it.getType();
             if (type == null) {
                 try {
-                    type = args.length == 4 ? Material.STONE : Material.valueOf(args[4].toUpperCase());
+                    type = args.length <= 4 ? Material.STONE : Material.valueOf(args[4].toUpperCase());
                 } catch (IllegalArgumentException e) {
                     sendMessage(sender, Language.replaceArgs(Language.commandGiveInvalidType, args[4]));
                     return;
@@ -236,12 +189,34 @@ public class ICCommand implements TabExecutor {
                 if (it.isEnchantment()) {
                     //noinspection DataFlowIssue
                     meta.addEnchant(Enchantment.getByName("DURABILITY"), 1, false);
-                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    if (plugin.mcVersion >= 8) { // 1.8才提供这个方法
+                        meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    }
                 }
                 item.setItemMeta(meta);
             }
-            player.getInventory().addItem(item);
+            addItem(player, item);
             sendMessage(sender, Language.replaceArgs(Language.commandGive, amount, name == null ? "§b" + type : name, player.getName()));
+        }
+    }
+
+    private void addItem(Player player, ItemStack... item) {
+        HashMap<Integer, ItemStack> overflow = player.getInventory().addItem(item);
+        if (!overflow.isEmpty()) {
+            Location loc = player.getLocation();
+            World world = player.getWorld();
+            for (Map.Entry<Integer, ItemStack> entry : overflow.entrySet()) {
+                ItemStack itemStack = entry.getValue();
+                int amount = itemStack.getAmount();
+                int max = itemStack.getMaxStackSize();
+                while (amount > max) {
+                    amount -= max;
+                    itemStack.setAmount(max);
+                    world.dropItemNaturally(loc, itemStack);
+                }
+                itemStack.setAmount(amount);
+                world.dropItem(loc, itemStack);
+            }
         }
     }
 

@@ -25,6 +25,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -106,6 +107,7 @@ public class ItemInfo {
             InputStream in = plugin.getResource("items.yml");
             if (in != null) {
                 try {
+                    //noinspection IOStreamConstructor
                     OutputStream out = new FileOutputStream(file);
                     byte[] buf = new byte[1024];
                     int len;
@@ -121,27 +123,33 @@ public class ItemInfo {
         }
     }
 
+    private static String getStringNotNull(String path) {
+        return config.getString(path, "");
+    }
+
     private static Item loadItem(ItemCommand plugin, String id) {
-        String name = config.getString(id + ".name");
+        String name = getStringNotNull(id + ".name");
         List<String> lore = config.getStringList(id + ".lore");
-        String typeString = config.getString(id + ".type");
-        if (name == null && lore.isEmpty() && typeString == null) {
+        String typeString = getStringNotNull(id + ".type");
+        if (name.isEmpty() && lore.isEmpty() && typeString.isEmpty()) {
             plugin.logMessage(Language.replaceArgs(Language.loadItemErrorNotMatch, id));
             return null;
         }
-        int customModelData = 0;
+        String customModelData;
         if (mcVersion >= 14) {
             if (config.contains(id + ".custom-model-data")) {
-                customModelData = config.getInt(id + ".custom-model-data", 0);
+                customModelData = getStringNotNull(id + ".custom-model-data");
             } else { //兼容旧版本命名
-                customModelData = config.getInt(id + ".customModelData", 0);
+                customModelData = getStringNotNull(id + ".customModelData");
             }
+        } else {
+            customModelData = "";
         }
 
         boolean loreExact = config.getBoolean(id + ".lore-exact", true);
 
         Material type = null;
-        if (typeString != null) {
+        if (!typeString.isEmpty()) {
             try {
                 type = Material.valueOf(typeString.toUpperCase());
             } catch (IllegalArgumentException e) {
@@ -153,7 +161,7 @@ public class ItemInfo {
         Expression[] condition = new Expression[conditionList.size()];
         for (int i = 0; i < condition.length; i++) {
             String conditionString = conditionList.get(i).trim();
-            String conditionType = Utils.getTextLeft(conditionString, ':');
+            String conditionType = Utils.getTextLeft(conditionString, ':', 2); //限制最大长度为2 不然可能会受 [动作:值] 里的 : 影响
             if (conditionType.isEmpty()) {
                 condition[i] = new SimpleBooleanExpression(conditionString);
             } else {
@@ -164,6 +172,9 @@ public class ItemInfo {
                         break;
                     case "d":
                         condition[i] = new SimpleDecimalExpression(conditionValue);
+                        break;
+                    case "b":
+                        condition[i] = new SimpleBooleanExpression(conditionValue);
                         break;
                     default:
                         condition[i] = new SimpleBooleanExpression(conditionString);
@@ -246,21 +257,24 @@ public class ItemInfo {
             }
         }
 
-        String price = config.getString(id + ".price");
-        String points = config.getString(id + ".points");
-        String levels = config.getString(id + ".levels");
-        String permission = config.getString(id + ".permission");
-        String requiredAmount = config.getString(id + ".required-amount");
-        String cooldown = config.getString(id + ".cooldown");
-        String cooldownMessage = config.getString(id + ".cooldown-message");
+        String price = getStringNotNull(id + ".price");
+        String points = getStringNotNull(id + ".points");
+        String levels = getStringNotNull(id + ".levels");
+        String permission = getStringNotNull(id + ".permission");
+        String requiredAmount = getStringNotNull(id + ".required-amount");
+        String cooldown = getStringNotNull(id + ".cooldown");
+        String cooldownMessage = getStringNotNull(id + ".cooldown-message");
         boolean enchantment = config.getBoolean(id + ".enchantment");
 
         return new Item(id, name, lore, loreExact, type, customModelData, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown, cooldownMessage, enchantment);
     }
 
     public static Item matchItem(Player player, ItemStack item, Trigger trigger) {
+        ItemMeta meta = item.getItemMeta();
+        assert meta != null;
+        List<String> lore = meta.getLore();
         for (Item it : items) {
-            if (it.match(player, item, trigger)) {
+            if (it.match(player, item, trigger, meta, lore)) {
                 return it;
             }
         }
@@ -277,7 +291,7 @@ public class ItemInfo {
                 return it;
             }
         }
-        return null;
+        return new Item(); //Empty
     }
 
 }

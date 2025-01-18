@@ -6,6 +6,7 @@ import net.myunco.itemcommand.config.Language;
 import net.myunco.itemcommand.item.expression.Expression;
 import net.myunco.itemcommand.util.Utils;
 import net.milkbowl.vault.economy.Economy;
+import org.apache.commons.lang.Validate;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -25,7 +26,7 @@ public class Item {
     private final List<String> lore;
     private final boolean loreExact;
     private final Material type;
-    private final int customModelData;
+    private final String customModelData;
     private final Expression[] condition;
     private final Trigger[] trigger;
     private final Action[] action;
@@ -38,8 +39,27 @@ public class Item {
     private final String cooldownMessage;
     private final boolean enchantment;
 
-    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, int customModelData, Expression[] condition, Trigger[] trigger, Action[] action,
+    public Item() {
+        this("", "", new ArrayList<>(0), false, Material.AIR, "", new Expression[0], new Trigger[0], new Action[0],
+                "", "", "", "", "", "", "", false);
+    }
+
+    public Item(String id, String name, List<String> lore, boolean loreExact, Material type, String customModelData, Expression[] condition, Trigger[] trigger, Action[] action,
                 String price, String points, String levels, String permission, String requiredAmount, String cooldown, String cooldownMessage, boolean enchantment) {
+        Validate.notNull(id, "id cannot be null");
+        Validate.notNull(name, "name cannot be null");
+        Validate.notNull(lore, "lore cannot be null");
+        Validate.notNull(customModelData, "customModelData cannot be null");
+        Validate.notNull(condition, "condition cannot be null");
+        Validate.notNull(trigger, "trigger cannot be null");
+        Validate.notNull(action, "action cannot be null");
+        Validate.notNull(price, "price cannot be null");
+        Validate.notNull(points, "points cannot be null");
+        Validate.notNull(levels, "levels cannot be null");
+        Validate.notNull(permission, "permission cannot be null");
+        Validate.notNull(requiredAmount, "requiredAmount cannot be null");
+        Validate.notNull(cooldown, "cooldown cannot be null");
+        Validate.notNull(cooldownMessage, "cooldownMessage cannot be null");
         this.id = id;
         this.name = name;
         this.lore = lore;
@@ -85,14 +105,16 @@ public class Item {
     }
 
     public int getCustomModelData() {
-        if (this.customModelData < 0) {
+        int customModelData = this.customModelData.isEmpty() ? 0 : Utils.parseInt(this.customModelData);
+        if (customModelData == -1) {
             plugin.logMessage(Language.replaceArgs(Language.commandGiveErrorModel, id, this.customModelData));
+            return 0;
         }
-        return this.customModelData;
+        return customModelData;
     }
 
     public double getPrice(Player player) {
-        double price = this.price == null ? 0.0 : Utils.parseDouble(plugin.replacePlaceholders(player, this.price));
+        double price = this.price.isEmpty() ? 0.0 : Utils.parseDouble(plugin.replacePlaceholders(player, this.price));
         if (price == -1.0) {
             plugin.logMessage(Language.replaceArgs(Language.useItemErrorPrice, id, this.price));
         }
@@ -100,7 +122,7 @@ public class Item {
     }
 
     public int getPoints(Player player) {
-        int points = this.points == null ? 0 : Utils.parseInt(plugin.replacePlaceholders(player, this.points));
+        int points = this.points.isEmpty() ? 0 : Utils.parseInt(plugin.replacePlaceholders(player, this.points));
         if (points == -1) {
             plugin.logMessage(Language.replaceArgs(Language.useItemErrorPoints, id, this.points));
         }
@@ -108,19 +130,19 @@ public class Item {
     }
 
     public int getLevels(Player player) {
-        int levels = this.levels == null ? 0 : Utils.parseInt(plugin.replacePlaceholders(player, this.levels));
+        int levels = this.levels.isEmpty() ? 0 : Utils.parseInt(plugin.replacePlaceholders(player, this.levels));
         if (levels == -1) {
             plugin.logMessage(Language.replaceArgs(Language.useItemErrorLevels, id, this.levels));
         }
         return levels;
     }
 
-    public String getPermission(Player player) {
+    private String getPermission(Player player) {
         return plugin.replacePlaceholders(player, permission);
     }
 
     public int getRequiredAmount(Player player) {
-        int requiredAmount = this.requiredAmount == null ? 0 : Utils.parseInt(plugin.replacePlaceholders(player, this.requiredAmount));
+        int requiredAmount = this.requiredAmount.isEmpty() ? 0 : Utils.parseInt(plugin.replacePlaceholders(player, this.requiredAmount));
         if (requiredAmount == -1) {
             plugin.logMessage(Language.replaceArgs(Language.useItemErrorRequiredAmount, id, this.requiredAmount));
         }
@@ -128,7 +150,7 @@ public class Item {
     }
 
     public long getCooldown(Player player) {
-        double cooldown = this.cooldown == null ? 0 : Utils.parseDouble(plugin.replacePlaceholders(player, this.cooldown));
+        double cooldown = this.cooldown.isEmpty() ? 0 : Utils.parseDouble(plugin.replacePlaceholders(player, this.cooldown));
         if (cooldown == -1) {
             plugin.logMessage(Language.replaceArgs(Language.useItemErrorCooldown, id, this.cooldown));
         }
@@ -136,29 +158,38 @@ public class Item {
     }
 
     public String getCooldownMessage(Player player) {
-        return cooldownMessage == null ? null : plugin.replacePlaceholders(player, cooldownMessage);
+        return cooldownMessage.isEmpty() ? null : plugin.replacePlaceholders(player, cooldownMessage);
     }
 
     public boolean isEnchantment() {
         return enchantment;
     }
 
-    public boolean match(Player player, ItemStack item, Trigger trigger) {
+    public boolean match(Player player, ItemStack item, Trigger trigger, ItemMeta meta, List<String> metaLore) {
         if (!triggerContains(trigger)) {
             return false;
         }
-        if (type != null && type != item.getType()) {
+        if (this.type != null && this.type != item.getType()) {
             return false;
         }
-        ItemMeta meta = item.getItemMeta();
-        if (name != null && (meta == null || !getName(player).equals(meta.getDisplayName()))) {
+        if (!this.name.isEmpty() && !getName(player).equals(meta.getDisplayName())) {
             return false;
         }
-        return lore.isEmpty() || (meta != null && meta.hasLore() && compareLore(getLore(player), meta.getLore()));
+        if (this.lore.isEmpty()) {
+            return true;
+        }
+        return matchLore(player, metaLore);
     }
 
-    private boolean compareLore(List<String> itemLore, List<String> metaLore) {
-        if (loreExact) {
+    private boolean matchLore(Player player, List<String> metaLore) {
+        if (metaLore == null) {
+            return false;
+        }
+        List<String> itemLore = this.getLore(player);
+        if (this.loreExact) {
+            if (itemLore.size() != metaLore.size()) {
+                return false;
+            }
             return itemLore.equals(metaLore);
         }
         //noinspection SlowListContainsAll
@@ -233,7 +264,7 @@ public class Item {
 
     public boolean hasPermission(Player player) {
         String permission = getPermission(player);
-        if (permission == null || permission.isEmpty() || player.hasPermission(permission)) {
+        if (permission.isEmpty() || player.hasPermission(permission)) {
             return true;
         }
         player.sendMessage(Language.useItemNotEnoughPermission);

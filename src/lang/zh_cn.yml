@@ -1,5 +1,5 @@
 #语言文件版本号 请勿修改
-version: 3
+version: 4
 
 log-prefix: '[ItemCommand] '
 message-prefix: '§8[§3ItemCommand§8] '
@@ -51,11 +51,13 @@ command-reload: '§a配置文件重载完成。'
 command-version: '§a当前版本: §b{0}'
 command-unknown: '§6未知的子命令'
 command-add-not-item: '§d你确定你手里有物品？'
+command-add-invalid-id: '§c无效的物品ID!'
+command-add-id-exist: '§c指定的物品ID已存在, 换一个ID吧!'
 command-add-not-name: '§a你手中的物品没有显示名称, 无法添加name项。'
 command-add-not-lore: '§a你手中的物品没有Lore, 无法添加lore项。'
 command-add-console: '§a控制台无法使用此命令。'
 command-add: '§a已添加到配置文件, ID为: {0}, 快去修改吧!'
-command-give-usage: '§6用法: /ic give <玩家> <物品ID> <物品数量> [物品类型]'
+command-give-usage: '§6用法: /ic give <玩家> <物品ID> [物品数量] [物品类型]'
 command-give-tip1: '§7(物品类型参数仅在指定ID的物品配置中未指定物品类型时需要, 默认为石头)'
 command-give-tip2: '§b<> = 必填参数 [] = 可选参数'
 command-give-not-found-player: '§c指定的玩家不在线或不存在！'

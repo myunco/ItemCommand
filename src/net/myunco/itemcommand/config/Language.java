@@ -62,6 +62,8 @@ public class Language {
     public static String commandVersion;
     public static String commandUnknown;
     public static String commandAddNotItem;
+    public static String commandAddInvalidId;
+    public static String commandAddIdExist;
     public static String commandAddNotName;
     public static String commandAddNotLore;
     public static String commandAddConsole;
@@ -141,11 +143,13 @@ public class Language {
         commandVersion = config.getString("command-version", "§a当前版本: §b{0}");
         commandUnknown = config.getString("command-unknown", "§6未知的子命令");
         commandAddNotItem = config.getString("command-add-not-item", "§d你确定你手里有物品？");
+        commandAddInvalidId = config.getString("command-add-invalid-id", "§c无效的物品ID!");
+        commandAddIdExist = config.getString("command-add-id-exist", "§c指定的物品ID已存在, 换一个ID吧!");
         commandAddNotName = config.getString("command-add-not-name", "§a你手中的物品没有显示名称, 无法添加name项。");
         commandAddNotLore = config.getString("command-add-not-lore", "§a你手中的物品没有Lore, 无法添加lore项。");
         commandAddConsole = config.getString("command-add-console", "§a控制台无法使用此命令。");
         commandAdd = config.getString("command-add", "§a已添加到配置文件, ID为: {0}, 快去修改吧!");
-        commandGiveUsage = config.getString("command-give-usage", "§6用法: /ic give <玩家> <物品ID> <物品数量> [物品类型]");
+        commandGiveUsage = config.getString("command-give-usage", "§6用法: /ic give <玩家> <物品ID> [物品数量] [物品类型]");
         commandGiveTip1 = config.getString("command-give-tip1", "§7(物品类型参数仅在指定ID的物品配置中未指定物品类型时需要, 默认为石头)");
         commandGiveTip2 = config.getString("command-give-tip2", "§b<> = 必填参数 [] = 可选参数");
         commandGiveNotFoundPlayer = config.getString("command-give-not-found-player", "§c指定的玩家不在线或不存在！");
@@ -166,6 +170,7 @@ public class Language {
                 InputStream in = plugin.getResource("lang/zh_cn.yml");
                 if (in != null) {
                     try {
+                        //noinspection IOStreamConstructor
                         OutputStream out = new FileOutputStream(lang);
                         byte[] buf = new byte[1024];
                         int len;
@@ -188,7 +193,7 @@ public class Language {
     }
 
     private static void languageUpdate(YamlConfiguration config, File lang) {
-        int latestVersion = 3;
+        int latestVersion = 4;
         if (version < latestVersion) {
             plugin.logMessage(replaceArgs(languageVersionOutdated, version, latestVersion));
             switch (version) {
@@ -201,6 +206,9 @@ public class Language {
                     config.set("action-parse-error-delay", "§e解析动作时出错! 在延时中发现无效数字: {0}");
                     config.set("action-parse-error-probability", "§e解析动作时出错! 在概率中发现无效数字: {0}");
                     config.set("action-parse-error-seed", "§e解析动作时出错! 在种子中发现无效数字: {0}");
+                case 3:
+                    config.set("command-add-invalid-id", "§c无效的物品ID!");
+                    config.set("command-add-id-exist", "§c指定的物品ID已存在, 换一个ID吧!");
                     break;
                 default:
                     plugin.logMessage(languageVersionError + version);

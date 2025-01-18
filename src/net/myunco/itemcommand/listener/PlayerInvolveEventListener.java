@@ -34,7 +34,7 @@ public class PlayerInvolveEventListener implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void playerInteractEvent(PlayerInteractEvent event) {
         if (event.hasItem() && event.getAction() != Action.PHYSICAL) {
-            ItemStack itemStack = event.getItem();
+            ItemStack itemStack = event.getItem(); //不会是null 不会是空气
             Player player = event.getPlayer();
             boolean leftClick = false;
             boolean mainHand = mcVersion < 9 || event.getHand() == EquipmentSlot.HAND;
@@ -81,7 +81,7 @@ public class PlayerInvolveEventListener implements Listener {
         if (ItemInfo.heldEvent) {
             Player player = event.getPlayer();
             ItemStack itemStack = player.getInventory().getItem(event.getNewSlot());
-            if (itemStack != null) {
+            if (itemStack != null) { //不会是空气
                 Item item = ItemInfo.matchItem(player, itemStack, Trigger.HELD);
                 if (item != null && useItem(player, item, itemStack, event.getNewSlot())) {
                     if (Config.cancelHeldEvent) {
@@ -223,7 +223,7 @@ public class PlayerInvolveEventListener implements Listener {
         if (time < current) {
             return false;
         }
-        if (cooldownMessage == null) {
+        if (cooldownMessage == null || cooldownMessage.isEmpty()) {
             cooldownMessage = Language.useItemCooling;
         } else if (cooldownMessage.equals("none")) {
             return true;

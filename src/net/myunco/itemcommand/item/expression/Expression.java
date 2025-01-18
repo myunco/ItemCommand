@@ -64,7 +64,7 @@ public interface Expression {
                     break;
                 }
                 args.add(currentPart.toString().trim());
-                currentPart = new StringBuilder();
+                currentPart.setLength(0);
             } else {
                 currentPart.append(c);
             }
