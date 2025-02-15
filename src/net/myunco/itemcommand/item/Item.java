@@ -4,8 +4,8 @@ import net.myunco.itemcommand.ItemCommand;
 import net.myunco.itemcommand.action.Action;
 import net.myunco.itemcommand.config.Language;
 import net.myunco.itemcommand.item.expression.Expression;
+import net.myunco.itemcommand.util.CompatibleEconomy;
 import net.myunco.itemcommand.util.Utils;
-import net.milkbowl.vault.economy.Economy;
 import org.apache.commons.lang.Validate;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Material;
@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Item {
     private final ItemCommand plugin = ItemCommand.getPlugin();
-    private final Economy economy = plugin.getEconomy();
+    private final CompatibleEconomy economy = plugin.getEconomy();
     private final PlayerPointsAPI pointsAPI = plugin.getPointsAPI();
 
     private final String id;
@@ -33,19 +33,21 @@ public class Item {
     private final String price;
     private final String points;
     private final String levels;
+    private final String foodLevel;
     private final String permission;
     private final String requiredAmount;
     private final String cooldown;
+    private final String cooldownGroup;
     private final String cooldownMessage;
     private final boolean enchantment;
 
     public Item() {
         this("", "", new ArrayList<>(0), false, Material.AIR, "", new Expression[0], new Trigger[0], new Action[0],
-                "", "", "", "", "", "", "", false);
+                "", "", "", "", "", "", "", "", "", false);
     }
 
     public Item(String id, String name, List<String> lore, boolean loreExact, Material type, String customModelData, Expression[] condition, Trigger[] trigger, Action[] action,
-                String price, String points, String levels, String permission, String requiredAmount, String cooldown, String cooldownMessage, boolean enchantment) {
+                String price, String points, String levels, String foodLevel, String permission, String requiredAmount, String cooldown, String cooldownGroup, String cooldownMessage, boolean enchantment) {
         Validate.notNull(id, "id cannot be null");
         Validate.notNull(name, "name cannot be null");
         Validate.notNull(lore, "lore cannot be null");
@@ -56,9 +58,11 @@ public class Item {
         Validate.notNull(price, "price cannot be null");
         Validate.notNull(points, "points cannot be null");
         Validate.notNull(levels, "levels cannot be null");
+        Validate.notNull(foodLevel, "foodLevel cannot be null");
         Validate.notNull(permission, "permission cannot be null");
         Validate.notNull(requiredAmount, "requiredAmount cannot be null");
         Validate.notNull(cooldown, "cooldown cannot be null");
+        Validate.notNull(cooldownGroup, "cooldownGroup cannot be null");
         Validate.notNull(cooldownMessage, "cooldownMessage cannot be null");
         this.id = id;
         this.name = name;
@@ -72,9 +76,11 @@ public class Item {
         this.price = price;
         this.points = points;
         this.levels = levels;
+        this.foodLevel = foodLevel;
         this.permission = permission;
         this.requiredAmount = requiredAmount;
         this.cooldown = cooldown;
+        this.cooldownGroup = cooldownGroup;
         this.cooldownMessage = cooldownMessage;
         this.enchantment = enchantment;
     }
@@ -137,6 +143,14 @@ public class Item {
         return levels;
     }
 
+    public int getFoodLevel(Player player) {
+        int foodLevel = this.foodLevel.isEmpty() ? 0 : Utils.parseInt(plugin.replacePlaceholders(player, this.foodLevel));
+        if (foodLevel == -1) {
+            plugin.logMessage(Language.replaceArgs(Language.useItemErrorFoodLevel, id, this.foodLevel));
+        }
+        return foodLevel;
+    }
+
     private String getPermission(Player player) {
         return plugin.replacePlaceholders(player, permission);
     }
@@ -155,6 +169,10 @@ public class Item {
             plugin.logMessage(Language.replaceArgs(Language.useItemErrorCooldown, id, this.cooldown));
         }
         return (long) (cooldown * 1000);
+    }
+
+    public String getCooldownId() {
+        return cooldownGroup.isEmpty() ? id : "cd-group:" + cooldownGroup;
     }
 
     public String getCooldownMessage(Player player) {
@@ -250,6 +268,12 @@ public class Item {
             player.sendMessage(Language.replaceArgs(Language.useItemNotEnoughLevels, levels));
             return false;
         }
+        int foodLevel = getFoodLevel(player);
+        boolean foodLevelFree = player.hasPermission("itemcommand.foodlevel.free");
+        if (foodLevel > 0 && !foodLevelFree && player.getFoodLevel() < foodLevel) {
+            player.sendMessage(Language.replaceArgs(Language.useItemNotEnoughFoodLevel, foodLevel));
+            return false;
+        }
         if (price > 0.0 && !priceFree && economy != null) {
             economy.withdrawPlayer(player, price);
         }
@@ -258,6 +282,9 @@ public class Item {
         }
         if (levels > 0 && !levelsFree) {
             player.setLevel(player.getLevel() - levels);
+        }
+        if (foodLevel > 0 && !foodLevelFree) {
+            player.setFoodLevel(player.getFoodLevel() - foodLevel);
         }
         return true;
     }

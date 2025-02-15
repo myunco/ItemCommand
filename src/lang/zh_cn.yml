@@ -1,5 +1,5 @@
 #语言文件版本号 请勿修改
-version: 4
+version: 5
 
 log-prefix: '[ItemCommand] '
 message-prefix: '§8[§3ItemCommand§8] '
@@ -37,13 +37,15 @@ use-item-condition-invalid-number: '§e解析条件时出错! 在数值比较表
 use-item-error-price: '§e解析 {0} 时出错! 无效的花费: price: {1}'
 use-item-error-points: '§e解析 {0} 时出错! 无效的花费: points: {1}'
 use-item-error-levels: '§e解析 {0} 时出错! 无效的花费: levels: {1}'
+use-item-error-food-level: '§e解析 {0} 时出错! 无效的花费: food-level: {1}'
 use-item-error-required-amount: '§e解析 {0} 时出错! 无效的需求数量: required-amount: {1}'
 use-item-error-cooldown: '§e解析 {0} 时出错! 无效的冷却时间: cooldown: {1}'
 use-item-error-not-economy: '§c错误: 未找到经济插件，无法扣除余额。'
 use-item-error-not-points: '§c错误: 未找到点券插件，无法扣除点券。'
-use-item-not-enough-money: '§c你没有足够的金钱({0})使用此物品。'
-use-item-not-enough-points: '§c你没有足够的点券({0})使用此物品。'
-use-item-not-enough-levels: '§c你没有足够的等级({0})使用此物品。'
+use-item-not-enough-money: '§c你没有足够的金钱({0})来使用此物品。'
+use-item-not-enough-points: '§c你没有足够的点券({0})来使用此物品。'
+use-item-not-enough-levels: '§c你没有足够的等级({0})来使用此物品。'
+use-item-not-enough-food-level: '§c你没有足够的饥饿度({0})来使用此物品。'
 use-item-not-enough-permission: '§c你没有权限使用此物品。'
 use-item-not-enough-amount: '§c你没有足够数量的物品可以使用。 (需要{0}个)'
 command-list: '§6已加载的物品ID列表: §a{0}'

@@ -21,6 +21,7 @@ import net.myunco.itemcommand.item.expression.SimpleBooleanExpression;
 import net.myunco.itemcommand.item.expression.SimpleDecimalExpression;
 import net.myunco.itemcommand.item.expression.SimpleStringExpression;
 import net.myunco.itemcommand.util.Utils;
+import net.myunco.itemcommand.util.Version;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -40,7 +41,7 @@ public class ItemInfo {
     public static final ArrayList<String> idList = new ArrayList<>();
     public static YamlConfiguration config;
     private static File itemsFile;
-    private static final int mcVersion = ItemCommand.getPlugin().mcVersion;
+    private static final Version mcVersion = ItemCommand.getPlugin().mcVersion;
     public static boolean heldEvent;
     public static boolean inventoryClickEvent;
     public static boolean entityDamageEvent;
@@ -109,7 +110,7 @@ public class ItemInfo {
                 try {
                     //noinspection IOStreamConstructor
                     OutputStream out = new FileOutputStream(file);
-                    byte[] buf = new byte[1024];
+                    byte[] buf = new byte[8192];
                     int len;
                     while ((len = in.read(buf)) != -1) {
                         out.write(buf, 0, len);
@@ -136,7 +137,7 @@ public class ItemInfo {
             return null;
         }
         String customModelData;
-        if (mcVersion >= 14) {
+        if (mcVersion.isGreaterThanOrEqualTo(14)) {
             if (config.contains(id + ".custom-model-data")) {
                 customModelData = getStringNotNull(id + ".custom-model-data");
             } else { //兼容旧版本命名
@@ -260,13 +261,18 @@ public class ItemInfo {
         String price = getStringNotNull(id + ".price");
         String points = getStringNotNull(id + ".points");
         String levels = getStringNotNull(id + ".levels");
+        String foodLevel = getStringNotNull(id + ".food-level");
         String permission = getStringNotNull(id + ".permission");
         String requiredAmount = getStringNotNull(id + ".required-amount");
         String cooldown = getStringNotNull(id + ".cooldown");
+        String cooldownGroup = getStringNotNull(id + ".cooldown-group");
+        if (cooldownGroup.indexOf('.') != -1) {
+            cooldownGroup = cooldownGroup.replace('.', '_');
+        }
         String cooldownMessage = getStringNotNull(id + ".cooldown-message");
         boolean enchantment = config.getBoolean(id + ".enchantment");
 
-        return new Item(id, name, lore, loreExact, type, customModelData, condition, trigger, action, price, points, levels, permission, requiredAmount, cooldown, cooldownMessage, enchantment);
+        return new Item(id, name, lore, loreExact, type, customModelData, condition, trigger, action, price, points, levels, foodLevel, permission, requiredAmount, cooldown, cooldownGroup, cooldownMessage, enchantment);
     }
 
     public static Item matchItem(Player player, ItemStack item, Trigger trigger) {

@@ -62,7 +62,7 @@ public class Action {
             }
         }
         if (delay > 0) {
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> execute(player), delay);
+            plugin.getScheduler().runTaskLater(() -> execute(player), delay);
         } else {
             execute(player);
         }

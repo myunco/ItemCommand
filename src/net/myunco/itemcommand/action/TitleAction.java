@@ -18,7 +18,7 @@ public class TitleAction extends Action {
 
     @Override
     public void execute(Player player) {
-        if (plugin.mcVersion < 8 || (plugin.mcVersion == 8 && plugin.mcVersionPatch < 7)) {
+        if (plugin.mcVersion.isLessThan(8, 7)) {
             plugin.logMessage(Language.actionExecuteErrorTitleNotSupport);
             return;
         }
@@ -48,7 +48,7 @@ public class TitleAction extends Action {
             return false;
         }
         if (time > 0) {
-            if (plugin.mcVersion > 10) {
+            if (plugin.mcVersion.isGreaterThan(10)) {
                 player.sendTitle(title, subtitle, 10, time * 20, 10);
             } else {
                 player.sendTitle(title, subtitle);

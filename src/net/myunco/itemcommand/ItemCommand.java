@@ -1,6 +1,8 @@
 package net.myunco.itemcommand;
 
 import me.clip.placeholderapi.PlaceholderAPI;
+import net.myunco.folia.FoliaCompatibleAPI;
+import net.myunco.folia.task.CompatibleScheduler;
 import net.myunco.itemcommand.command.ICCommand;
 import net.myunco.itemcommand.config.Config;
 import net.myunco.itemcommand.config.CooldownInfo;
@@ -11,8 +13,11 @@ import net.myunco.itemcommand.metrics.Metrics;
 import net.myunco.itemcommand.update.UpdateChecker;
 import net.myunco.itemcommand.update.UpdateNotification;
 import net.milkbowl.vault.economy.Economy;
+import net.myunco.itemcommand.util.CompatibleEconomy;
+import net.myunco.itemcommand.util.Version;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
@@ -20,20 +25,30 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 public class ItemCommand extends JavaPlugin {
     private static ItemCommand plugin;
-    private Economy economy;
+    private CompatibleEconomy economy;
     private PlayerPoints points;
     private boolean enablePAPI;
     private String papiVersion;
-    public int mcVersion;
-    public int mcVersionPatch;
+    public Version mcVersion;
+    private CompatibleScheduler scheduler;
 
     @Override
     public void onEnable() {
         plugin = this;
-        mcVersion = getMinecraftVersion();
-        getLogger().info("Minecraft version: 1" + mcVersion + mcVersionPatch);
+        mcVersion = new Version(getServer().getBukkitVersion());
+        getLogger().info("Minecraft version: " + mcVersion);
+        initScheduler();
+        if (scheduler == null) {
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
         init();
         initCommand();
         getServer().getMessenger().registerOutgoingPluginChannel(this, "BungeeCord");
@@ -88,15 +103,6 @@ public class ItemCommand extends JavaPlugin {
         return plugin;
     }
 
-    private int getMinecraftVersion() {
-        String[] version = getServer().getBukkitVersion().replace('-', '.').split("\\.");
-        try {
-            mcVersionPatch = Integer.parseInt(version[2]);
-        } catch (NumberFormatException ignored) {
-        }
-        return Integer.parseInt(version[1]);
-    }
-
     public void setupEconomy() {
         if (!getServer().getPluginManager().isPluginEnabled("Vault")) {
             return;
@@ -105,8 +111,14 @@ public class ItemCommand extends JavaPlugin {
         if (rsp == null) {
             return;
         }
-        economy = rsp.getProvider();
-        logMessage("Using economy system: §3" + economy.getName());
+        boolean old = false;
+        try {
+            Economy.class.getMethod("hasAccount", OfflinePlayer.class);
+        } catch (NoSuchMethodException e) {
+            old = true;
+        }
+        economy = new CompatibleEconomy(rsp.getProvider(), old);
+        logMessage("Using economy system: §3" + economy.getName() + " v" + rsp.getPlugin().getDescription().getVersion());
     }
 
     public void setupPoints() {
@@ -118,12 +130,48 @@ public class ItemCommand extends JavaPlugin {
         logMessage("Found PlayerPoints: §3v" + playerPoints.getDescription().getVersion());
     }
 
-    public Economy getEconomy() {
+    public void initScheduler() {
+        Plugin compatibleAPI = getServer().getPluginManager().getPlugin("FoliaCompatibleAPI");
+        if (compatibleAPI == null) {
+            getLogger().warning("FoliaCompatibleAPI not found!");
+            try {
+                File file = new File(getDataFolder().getParentFile(), "FoliaCompatibleAPI-1.0.0.jar");
+                InputStream in = getResource("lib/FoliaCompatibleAPI-1.0.0.jar");
+                if (in != null) {
+                        //noinspection IOStreamConstructor
+                        OutputStream out = new FileOutputStream(file);
+                        byte[] buf = new byte[8192];
+                        int len;
+                        while ((len = in.read(buf)) != -1) {
+                            out.write(buf, 0, len);
+                        }
+                        out.close();
+                        in.close();
+                }
+                compatibleAPI = getServer().getPluginManager().loadPlugin(file);
+                assert compatibleAPI != null;
+                getServer().getPluginManager().enablePlugin(compatibleAPI);
+                compatibleAPI.onLoad();
+            } catch (Exception e) {
+                e.printStackTrace();
+                getLogger().severe("未安装 FoliaCompatibleAPI ，本插件无法运行！");
+                return;
+            }
+        }
+        scheduler = ((FoliaCompatibleAPI) compatibleAPI).getScheduler(this);
+        getServer().getConsoleSender().sendMessage("[ItemCommand] Found FoliaCompatibleAPI: §3v" + compatibleAPI.getDescription().getVersion());
+    }
+
+    public CompatibleEconomy getEconomy() {
         return economy;
     }
 
     public PlayerPointsAPI getPointsAPI() {
         return points == null ? null : points.getAPI();
+    }
+
+    public CompatibleScheduler getScheduler() {
+        return scheduler;
     }
 
     public String replacePlaceholders(Player player, String text) {

@@ -1,6 +1,6 @@
 name: ItemCommand
 main: net.myunco.itemcommand.ItemCommand
-version: 1.2.2
+version: 1.3.0
 api-version: 1.13
 author: myunco
 website: https://github.com/myunco/ItemCommand
@@ -10,6 +10,8 @@ softdepend:
   - Vault
   - PlayerPoints
   - PlaceholderAPI
+  - FoliaCompatibleAPI
+folia-supported: true
 commands:
   ItemCommand:
     usage: '§6用法: /ItemCommand §e<§6add§7|§6give§7|§6list§7|§6reload§7|§6type§7|§6version§e>'
@@ -26,4 +28,6 @@ permissions:
   itemcommand.points.free:
     default: op
   itemcommand.levels.free:
+    default: op
+  itemcommand.foodlevel.free:
     default: op

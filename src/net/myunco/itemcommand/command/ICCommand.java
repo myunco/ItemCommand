@@ -86,7 +86,7 @@ public class ICCommand implements TabExecutor {
     @SuppressWarnings("deprecation")
     private void commandAdd(CommandSender sender, String[] args) {
         if (sender instanceof Player) {
-            ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
+            ItemStack item = plugin.mcVersion.isGreaterThan(8) ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandAddNotItem);
                 return;
@@ -118,7 +118,7 @@ public class ICCommand implements TabExecutor {
             }
             ItemInfo.config.set(id + ".lore-exact", true);
             ItemInfo.config.set(id + ".type", item.getType().toString());
-            if (plugin.mcVersion >= 14) {
+            if (plugin.mcVersion.isGreaterThanOrEqualTo(14)) {
                 ItemInfo.config.set(id + ".custom-model-data", meta.getCustomModelData());
             }
             ItemInfo.config.set(id + ".condition", Collections.singletonList("true"));
@@ -127,9 +127,11 @@ public class ICCommand implements TabExecutor {
             ItemInfo.config.set(id + ".price", 0);
             ItemInfo.config.set(id + ".points", 0);
             ItemInfo.config.set(id + ".levels", 0);
+            ItemInfo.config.set(id + ".food-level", 0);
             ItemInfo.config.set(id + ".permission", "");
             ItemInfo.config.set(id + ".required-amount", 1);
             ItemInfo.config.set(id + ".cooldown", 0);
+            ItemInfo.config.set(id + ".cooldown-group", "");
             ItemInfo.config.set(id + ".cooldown-message", "");
             ItemInfo.saveConfig();
             sendMessage(sender, Language.replaceArgs(Language.commandAdd, id));
@@ -189,7 +191,7 @@ public class ICCommand implements TabExecutor {
                 if (it.isEnchantment()) {
                     //noinspection DataFlowIssue
                     meta.addEnchant(Enchantment.getByName("DURABILITY"), 1, false);
-                    if (plugin.mcVersion >= 8) { // 1.8才提供这个方法
+                    if (plugin.mcVersion.isGreaterThanOrEqualTo(8)) { // 1.8才提供这个方法
                         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                     }
                 }
@@ -223,12 +225,12 @@ public class ICCommand implements TabExecutor {
     @SuppressWarnings("deprecation")
     private void commandType(CommandSender sender) {
         if (sender instanceof Player) {
-            ItemStack item = plugin.mcVersion > 8 ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
+            ItemStack item = plugin.mcVersion.isGreaterThan(8) ? ((Player) sender).getInventory().getItemInMainHand() : ((Player) sender).getItemInHand();
             if (item.getType() == Material.AIR) {
                 sendMessage(sender, Language.commandTypeNotItem);
                 return;
             }
-            if (plugin.mcVersion >= 14 && item.getItemMeta() != null && item.getItemMeta().hasCustomModelData()) {
+            if (plugin.mcVersion.isGreaterThanOrEqualTo(14) && item.getItemMeta() != null && item.getItemMeta().hasCustomModelData()) {
                 sendMessage(sender, Language.replaceArgs(Language.commandType, item.getType() + " (CustomModel:" + item.getItemMeta().getCustomModelData() + ")"));
             } else {
                 sendMessage(sender, Language.replaceArgs(Language.commandType, item.getType()));

@@ -7,6 +7,7 @@ import net.myunco.itemcommand.config.ItemInfo;
 import net.myunco.itemcommand.config.Language;
 import net.myunco.itemcommand.item.Item;
 import net.myunco.itemcommand.item.Trigger;
+import net.myunco.itemcommand.util.Version;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -29,15 +30,16 @@ import java.util.UUID;
 
 public class PlayerInvolveEventListener implements Listener {
     public static final HashMap<UUID, HashMap<String, Long>> cdMap = new HashMap<>();
-    private final int mcVersion = ItemCommand.getPlugin().mcVersion;
+    private final Version mcVersion = ItemCommand.getPlugin().mcVersion;
 
     @EventHandler(priority = EventPriority.LOW)
     public void playerInteractEvent(PlayerInteractEvent event) {
         if (event.hasItem() && event.getAction() != Action.PHYSICAL) {
             ItemStack itemStack = event.getItem(); //不会是null 不会是空气
+            assert itemStack != null;
             Player player = event.getPlayer();
             boolean leftClick = false;
-            boolean mainHand = mcVersion < 9 || event.getHand() == EquipmentSlot.HAND;
+            boolean mainHand = mcVersion.isLessThan(9) || event.getHand() == EquipmentSlot.HAND;
             Item item;
             switch (event.getAction()) {
                 case LEFT_CLICK_AIR:
@@ -97,8 +99,8 @@ public class PlayerInvolveEventListener implements Listener {
         if (!ItemInfo.inventoryClickEvent) {
             return;
         }
-        Inventory inventory = mcVersion < 8 ? event.getInventory() : event.getClickedInventory();
-        if (mcVersion < 8 ? inventory instanceof CraftingInventory : inventory instanceof PlayerInventory) {
+        Inventory inventory = mcVersion.isLessThan(8) ? event.getInventory() : event.getClickedInventory();
+        if (mcVersion.isLessThan(8) ? inventory instanceof CraftingInventory : inventory instanceof PlayerInventory) {
             ItemStack itemStack = event.getCurrentItem();
             if (itemStack != null && itemStack.getType() != Material.AIR) {
                 Player player = (Player) event.getWhoClicked();
@@ -152,7 +154,7 @@ public class PlayerInvolveEventListener implements Listener {
                     useItem(player, item, stack, player.getInventory().getHeldItemSlot());
                 }
             }
-            if (mcVersion >= 9) {
+            if (mcVersion.isGreaterThanOrEqualTo(9)) {
                 stack = player.getInventory().getItemInOffHand();
                 if (stack.getType() != Material.AIR) {
                     Item item = ItemInfo.matchItem(player, stack, Trigger.OFFHAND_HIT);
@@ -173,10 +175,10 @@ public class PlayerInvolveEventListener implements Listener {
     }
 
     private static boolean useItem(Player player, Item item, ItemStack itemStack, int slot) {
-        if (item.hasPermission(player) && !isCooling(player, item.getId(), item.getCooldownMessage(player)) && item.hasEnoughAmount(player, itemStack) && item.matchCondition(player) && item.charge(player)) {
+        if (item.hasPermission(player) && !isCooling(player, item.getCooldownId(), item.getCooldownMessage(player)) && item.hasEnoughAmount(player, itemStack) && item.matchCondition(player) && item.charge(player)) {
             long cooldown = item.getCooldown(player);
             if (cooldown > 0) {
-                putCooldown(player.getUniqueId(), item.getId(), cooldown);
+                putCooldown(player.getUniqueId(), item.getCooldownId(), cooldown);
             }
             int requiredAmount = item.getRequiredAmount(player);
             if (requiredAmount > 0) {
@@ -199,15 +201,15 @@ public class PlayerInvolveEventListener implements Listener {
         return true;
     }
 
-    private static void putCooldown(UUID player, String itemID, long cooldown) {
+    private static void putCooldown(UUID player, String cooldownId, long cooldown) {
         long cdEndTime = System.currentTimeMillis() + cooldown;
-        cdMap.computeIfAbsent(player, k -> new HashMap<>()).put(itemID, cdEndTime);
+        cdMap.computeIfAbsent(player, k -> new HashMap<>()).put(cooldownId, cdEndTime);
         if (cooldown > 300000) { // 5分钟以上才持久化保存 减少资源消耗
-            CooldownInfo.putCooldownInfo(player.toString(), itemID, cdEndTime);
+            CooldownInfo.putCooldownInfo(player.toString(), cooldownId, cdEndTime);
         }
     }
 
-    private static boolean isCooling(Player player, String itemID, String cooldownMessage) {
+    private static boolean isCooling(Player player, String cooldownId, String cooldownMessage) {
         if (player.hasPermission("itemcommand.cooldown.bypass")) {
             return false;
         }
@@ -215,7 +217,7 @@ public class PlayerInvolveEventListener implements Listener {
         if (map == null) {
             return false;
         }
-        Long time = map.get(itemID);
+        Long time = map.get(cooldownId);
         if (time == null) {
             return false;
         }

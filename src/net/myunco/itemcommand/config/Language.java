@@ -48,6 +48,7 @@ public class Language {
     public static String useItemErrorPrice;
     public static String useItemErrorPoints;
     public static String useItemErrorLevels;
+    public static String useItemErrorFoodLevel;
     public static String useItemErrorRequiredAmount;
     public static String useItemErrorCooldown;
     public static String useItemErrorNotEconomy;
@@ -55,6 +56,7 @@ public class Language {
     public static String useItemNotEnoughMoney;
     public static String useItemNotEnoughPoints;
     public static String useItemNotEnoughLevels;
+    public static String useItemNotEnoughFoodLevel;
     public static String useItemNotEnoughPermission;
     public static String useItemNotEnoughAmount;
     public static String commandList;
@@ -129,13 +131,15 @@ public class Language {
         useItemErrorPrice = config.getString("use-item-error-price", "§e解析 {0} 时出错! 无效的花费: price: {1}");
         useItemErrorPoints = config.getString("use-item-error-points", "§e解析 {0} 时出错! 无效的花费: points: {1}");
         useItemErrorLevels = config.getString("use-item-error-levels", "§e解析 {0} 时出错! 无效的花费: levels: {1}");
+        useItemErrorFoodLevel = config.getString("use-item-error-food-level", "§e解析 {0} 时出错! 无效的花费: food-level: {1}");
         useItemErrorRequiredAmount = config.getString("use-item-error-required-amount", "§e解析 {0} 时出错! 无效的需求数量: required-amount: {1}");
         useItemErrorCooldown = config.getString("use-item-error-cooldown", "§e解析 {0} 时出错! 无效的冷却时间: cooldown: {1}");
         useItemErrorNotEconomy = config.getString("use-item-error-not-economy", "§c错误: 未找到经济插件，无法扣除余额。");
         useItemErrorNotPoints = config.getString("use-item-error-not-points", "§c错误: 未找到点券插件，无法扣除点券。");
-        useItemNotEnoughMoney = config.getString("use-item-not-enough-money", "§c你没有足够的金钱({0})使用此物品。");
-        useItemNotEnoughPoints = config.getString("use-item-not-enough-points", "§c你没有足够的点券({0})使用此物品。");
-        useItemNotEnoughLevels = config.getString("use-item-not-enough-levels", "§c你没有足够的等级({0})使用此物品。");
+        useItemNotEnoughMoney = config.getString("use-item-not-enough-money", "§c你没有足够的金钱({0})来使用此物品。");
+        useItemNotEnoughPoints = config.getString("use-item-not-enough-points", "§c你没有足够的点券({0})来使用此物品。");
+        useItemNotEnoughLevels = config.getString("use-item-not-enough-levels", "§c你没有足够的等级({0})来使用此物品。");
+        useItemNotEnoughFoodLevel = config.getString("use-item-not-enough-food-level", "§c你没有足够的饥饿度({0})来使用此物品。");
         useItemNotEnoughPermission = config.getString("use-item-not-enough-permission", "§c你没有权限使用此物品。");
         useItemNotEnoughAmount = config.getString("use-item-not-enough-amount", "§c你没有足够数量的物品可以使用。 (需要{0}个)");
         commandList = config.getString("command-list", "§6已加载的物品ID列表: §a{0}");
@@ -172,7 +176,7 @@ public class Language {
                     try {
                         //noinspection IOStreamConstructor
                         OutputStream out = new FileOutputStream(lang);
-                        byte[] buf = new byte[1024];
+                        byte[] buf = new byte[8192];
                         int len;
                         while ((len = in.read(buf)) != -1) {
                             out.write(buf, 0, len);
@@ -193,7 +197,7 @@ public class Language {
     }
 
     private static void languageUpdate(YamlConfiguration config, File lang) {
-        int latestVersion = 4;
+        int latestVersion = 5;
         if (version < latestVersion) {
             plugin.logMessage(replaceArgs(languageVersionOutdated, version, latestVersion));
             switch (version) {
@@ -209,6 +213,9 @@ public class Language {
                 case 3:
                     config.set("command-add-invalid-id", "§c无效的物品ID!");
                     config.set("command-add-id-exist", "§c指定的物品ID已存在, 换一个ID吧!");
+                case 4:
+                    config.set("use-item-error-food-level", "§e解析 {0} 时出错! 无效的花费: food-level: {1}");
+                    config.set("use-item-not-enough-food-level", "§c你没有足够的饥饿度({0})来使用此物品。");
                     break;
                 default:
                     plugin.logMessage(languageVersionError + version);

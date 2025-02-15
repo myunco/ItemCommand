@@ -1,5 +1,5 @@
 #配置文件版本号 请勿修改
-version: 1
+version: 2
 
 #语言 默认为简体中文
 language: 'zh_cn'
@@ -21,3 +21,7 @@ cancelInvLeftEvent: true
 
 #物品栏内右键使用物品后是否取消点击事件
 cancelInvRightEvent: true
+
+#以玩家身份执行命令时是否使用performCommand方法 设为false则使用chat方法
+#使用chat方法执行命令，其他插件可以监听并处理或拦截命令。使用performCommand方法执行命令，命令无法被其他插件监听、处理或拦截
+usePerformCommand: false
