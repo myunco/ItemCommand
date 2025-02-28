@@ -277,8 +277,11 @@ public class ItemInfo {
 
     public static Item matchItem(Player player, ItemStack item, Trigger trigger) {
         ItemMeta meta = item.getItemMeta();
-        assert meta != null;
-        List<String> lore = meta.getLore();
+        // assert meta != null; //正常情况下，即使 hasItemMeta()=false meta也不会为null 但QuickShop-0.9.35这个插件会自己创建一个PlayerInteractEvent并callEvent，而且这个event的ItemStack的itemMeta是null
+        List<String> lore = null;
+        if (meta != null) {
+            lore = meta.getLore();
+        }
         for (Item it : items) {
             if (it.match(player, item, trigger, meta, lore)) {
                 return it;

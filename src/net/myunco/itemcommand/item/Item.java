@@ -190,7 +190,7 @@ public class Item {
         if (this.type != null && this.type != item.getType()) {
             return false;
         }
-        if (!this.name.isEmpty() && !getName(player).equals(meta.getDisplayName())) {
+        if (!this.name.isEmpty() && (meta == null || !getName(player).equals(meta.getDisplayName()))) {
             return false;
         }
         if (this.lore.isEmpty()) {

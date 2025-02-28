@@ -1,6 +1,6 @@
 name: ItemCommand
 main: net.myunco.itemcommand.ItemCommand
-version: 1.3.0
+version: 1.3.1
 api-version: 1.13
 author: myunco
 website: https://github.com/myunco/ItemCommand

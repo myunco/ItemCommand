@@ -91,7 +91,7 @@ public class ItemCommand extends JavaPlugin {
         CooldownInfo.loadCooldownInfo(PlayerInvolveEventListener.cdMap);
     }
 
-    public void initCommand() {
+    private void initCommand() {
         PluginCommand command = getCommand("ItemCommand");
         if (command != null) {
             command.setExecutor(new ICCommand(this));
@@ -103,7 +103,7 @@ public class ItemCommand extends JavaPlugin {
         return plugin;
     }
 
-    public void setupEconomy() {
+    private void setupEconomy() {
         if (!getServer().getPluginManager().isPluginEnabled("Vault")) {
             return;
         }
@@ -121,7 +121,7 @@ public class ItemCommand extends JavaPlugin {
         logMessage("Using economy system: §3" + economy.getName() + " v" + rsp.getPlugin().getDescription().getVersion());
     }
 
-    public void setupPoints() {
+    private void setupPoints() {
         PlayerPoints playerPoints = (PlayerPoints) getServer().getPluginManager().getPlugin("PlayerPoints");
         if (playerPoints == null || !playerPoints.isEnabled()) {
             return;
@@ -130,36 +130,42 @@ public class ItemCommand extends JavaPlugin {
         logMessage("Found PlayerPoints: §3v" + playerPoints.getDescription().getVersion());
     }
 
-    public void initScheduler() {
-        Plugin compatibleAPI = getServer().getPluginManager().getPlugin("FoliaCompatibleAPI");
-        if (compatibleAPI == null) {
+    private void initScheduler() {
+        Plugin api = getServer().getPluginManager().getPlugin("FoliaCompatibleAPI");
+        if (api == null) {
             getLogger().warning("FoliaCompatibleAPI not found!");
+            File file = new File(getDataFolder().getParentFile(), "FoliaCompatibleAPI-1.1.0.jar");
+            InputStream in = getResource("lib/FoliaCompatibleAPI-1.1.0.jar");
             try {
-                File file = new File(getDataFolder().getParentFile(), "FoliaCompatibleAPI-1.0.0.jar");
-                InputStream in = getResource("lib/FoliaCompatibleAPI-1.0.0.jar");
-                if (in != null) {
-                        //noinspection IOStreamConstructor
-                        OutputStream out = new FileOutputStream(file);
-                        byte[] buf = new byte[8192];
-                        int len;
-                        while ((len = in.read(buf)) != -1) {
-                            out.write(buf, 0, len);
-                        }
-                        out.close();
-                        in.close();
+                saveResource(file, in);
+                api = getServer().getPluginManager().loadPlugin(file);
+                if (api == null) {
+                    throw new Exception("FoliaCompatibleAPI load failed!");
                 }
-                compatibleAPI = getServer().getPluginManager().loadPlugin(file);
-                assert compatibleAPI != null;
-                getServer().getPluginManager().enablePlugin(compatibleAPI);
-                compatibleAPI.onLoad();
+                getServer().getPluginManager().enablePlugin(api);
+                api.onLoad();
             } catch (Exception e) {
                 e.printStackTrace();
                 getLogger().severe("未安装 FoliaCompatibleAPI ，本插件无法运行！");
                 return;
             }
         }
-        scheduler = ((FoliaCompatibleAPI) compatibleAPI).getScheduler(this);
-        getServer().getConsoleSender().sendMessage("[ItemCommand] Found FoliaCompatibleAPI: §3v" + compatibleAPI.getDescription().getVersion());
+        scheduler = ((FoliaCompatibleAPI) api).getScheduler(this);
+        getServer().getConsoleSender().sendMessage("[ItemCommand] Found FoliaCompatibleAPI: §3v" + api.getDescription().getVersion());
+    }
+
+    private void saveResource(File target, InputStream source) throws Exception {
+        if (source != null) {
+            //noinspection IOStreamConstructor
+            OutputStream out = new FileOutputStream(target);
+            byte[] buf = new byte[8192];
+            int len;
+            while ((len = source.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
+            out.close();
+            source.close();
+        }
     }
 
     public CompatibleEconomy getEconomy() {
