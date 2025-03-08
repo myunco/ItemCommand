@@ -2,7 +2,7 @@ package net.myunco.itemcommand;
 
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.myunco.folia.FoliaCompatibleAPI;
-import net.myunco.folia.task.CompatibleScheduler;
+import net.myunco.folia.scheduler.CompatibleScheduler;
 import net.myunco.itemcommand.command.ICCommand;
 import net.myunco.itemcommand.config.Config;
 import net.myunco.itemcommand.config.CooldownInfo;
@@ -134,8 +134,8 @@ public class ItemCommand extends JavaPlugin {
         Plugin api = getServer().getPluginManager().getPlugin("FoliaCompatibleAPI");
         if (api == null) {
             getLogger().warning("FoliaCompatibleAPI not found!");
-            File file = new File(getDataFolder().getParentFile(), "FoliaCompatibleAPI-1.1.0.jar");
-            InputStream in = getResource("lib/FoliaCompatibleAPI-1.1.0.jar");
+            File file = new File(getDataFolder().getParentFile(), "FoliaCompatibleAPI-1.2.0.jar");
+            InputStream in = getResource("lib/FoliaCompatibleAPI-1.2.0.jar");
             try {
                 saveResource(file, in);
                 api = getServer().getPluginManager().loadPlugin(file);
@@ -149,6 +149,16 @@ public class ItemCommand extends JavaPlugin {
                 getLogger().severe("未安装 FoliaCompatibleAPI ，本插件无法运行！");
                 return;
             }
+        } else if (api.getDescription().getVersion().compareTo("1.2.0") < 0) {
+            getLogger().warning("FoliaCompatibleAPI version is " + api.getDescription().getVersion() + ", please update to 1.2.0 or later!");
+            try {
+                File file = new File(api.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
+                saveResource(file, getResource("lib/FoliaCompatibleAPI-1.2.0.jar"));
+                getLogger().warning("已自动升级FoliaCompatibleAPI至1.2.0，此版本为不兼容更新，请更新所有使用1.2.0以下版本的插件到最新版本并重启服务器！");
+                if (getServer().getPluginManager().getPlugin("ILoreEdit") != null) {
+                    getLogger().warning("已知使用1.2.0以下版本的插件：ILoreEdit-2.7.0");
+                }
+            } catch (Exception ignored) {}
         }
         scheduler = ((FoliaCompatibleAPI) api).getScheduler(this);
         getServer().getConsoleSender().sendMessage("[ItemCommand] Found FoliaCompatibleAPI: §3v" + api.getDescription().getVersion());

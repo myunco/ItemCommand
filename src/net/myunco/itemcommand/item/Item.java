@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class Item {
@@ -210,8 +211,7 @@ public class Item {
             }
             return itemLore.equals(metaLore);
         }
-        //noinspection SlowListContainsAll
-        return metaLore.containsAll(itemLore);
+        return new HashSet<>(metaLore).containsAll(itemLore);
     }
 
     public boolean matchCondition(Player player) {

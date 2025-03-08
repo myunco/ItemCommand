@@ -36,7 +36,7 @@ public class UpdateChecker {
                         plugin.logMessage(Language.updateCheckFailure + result.getErrorMessage());
                     }
                 }
-            }, 7000, 12 * 60 * 60 * 1000);
+            }, 6000, 12 * 60 * 60 * 1000);
         });
     }
 

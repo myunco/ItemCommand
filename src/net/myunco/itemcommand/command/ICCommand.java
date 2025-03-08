@@ -118,7 +118,7 @@ public class ICCommand implements TabExecutor {
             }
             ItemInfo.config.set(id + ".lore-exact", true);
             ItemInfo.config.set(id + ".type", item.getType().toString());
-            if (plugin.mcVersion.isGreaterThanOrEqualTo(14)) {
+            if (plugin.mcVersion.isGreaterThanOrEqualTo(14) && meta.hasCustomModelData()) {
                 ItemInfo.config.set(id + ".custom-model-data", meta.getCustomModelData());
             }
             ItemInfo.config.set(id + ".condition", Collections.singletonList("true"));

@@ -31,6 +31,12 @@ public class SimpleStringExpression implements Expression {
         }
         String left = plugin.replacePlaceholders(player, this.left);
         String right = plugin.replacePlaceholders(player, this.right);
+        if (left.equals("\"\"")) {
+            left = "";
+        }
+        if (right.equals("\"\"")) {
+            right = "";
+        }
         switch (operator) {
             case "=":
                 return left.equals(right);
