@@ -235,9 +235,10 @@ public class Item {
     }
 
     public void executeAction(Player player) {
+        long seed = System.nanoTime();
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0; i < action.length; i++) {
-            action[i].call(player);
+            action[i].call(player, seed);
         }
     }
 

@@ -11,7 +11,7 @@ public class Action {
     public static ItemCommand plugin = ItemCommand.getPlugin();
     protected final String value;
     protected int delay;
-    protected int probability = 100;
+    protected int probability = 1000;
     protected long seed;
 
     public Action(String value) {
@@ -27,12 +27,12 @@ public class Action {
             }
             if (v.length > 2) {
                 if (v[2].indexOf(':') == -1) {
-                    probability = Utils.parseInt(v[2]);
+                    probability = (int) (Utils.parseDouble(v[2]) * 10);
                     if (probability == -1) {
                         plugin.logMessage(Language.replaceArgs(Language.actionParseErrorProbability, v[2]));
                     }
                 } else {
-                    probability = Utils.parseInt(Utils.getTextLeft(v[2], ':'));
+                    probability = (int) (Utils.parseDouble(Utils.getTextLeft(v[2], ':')) * 10);
                     if (probability == -1) {
                         plugin.logMessage(Language.replaceArgs(Language.actionParseErrorProbability, v[2]));
                     }
@@ -46,18 +46,18 @@ public class Action {
         return v[0];
     }
 
-    public void call (Player player) {
+    public void call (Player player, long initialSeed) {
         if (probability <= 0) { // 概率为0，不执行
             return;
         }
-        if (probability < 100) {
+        if (probability < 1000) {
             Random random;
             if (seed != 0) {
-                random = new Random(System.currentTimeMillis() / 100 + seed);
+                random = new Random(initialSeed + seed);
             } else {
-                random = new Random();
+                random = new Random(initialSeed);
             }
-            if (random.nextInt(100) + 1 > probability) {
+            if (random.nextInt(1000) + 1 > probability) {
                 return;
             }
         }

@@ -60,8 +60,9 @@ public class SimpleStringExpression implements Expression {
 
     @Override
     public void executeAction(Player player) {
+        long seed = System.nanoTime();
         for (Action act : action) {
-            act.call(player);
+            act.call(player, seed);
         }
     }
 
