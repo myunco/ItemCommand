@@ -137,7 +137,7 @@ public class ItemInfo {
             return null;
         }
         String customModelData;
-        if (mcVersion.isGreaterThanOrEqualTo(14)) {
+        if (mcVersion.isGreaterOrEqual(14)) {
             if (config.contains(id + ".custom-model-data")) {
                 customModelData = getStringNotNull(id + ".custom-model-data");
             } else { //兼容旧版本命名

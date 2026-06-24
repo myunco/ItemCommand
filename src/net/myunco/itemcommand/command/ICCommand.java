@@ -118,7 +118,7 @@ public class ICCommand implements TabExecutor {
             }
             ItemInfo.config.set(id + ".lore-exact", true);
             ItemInfo.config.set(id + ".type", item.getType().toString());
-            if (plugin.mcVersion.isGreaterThanOrEqualTo(14) && meta.hasCustomModelData()) {
+            if (plugin.mcVersion.isGreaterOrEqual(14) && meta.hasCustomModelData()) {
                 ItemInfo.config.set(id + ".custom-model-data", meta.getCustomModelData());
             }
             ItemInfo.config.set(id + ".condition", Collections.singletonList("true"));
@@ -191,7 +191,7 @@ public class ICCommand implements TabExecutor {
                 if (it.isEnchantment()) {
                     //noinspection DataFlowIssue
                     meta.addEnchant(Enchantment.getByName("DURABILITY"), 1, false);
-                    if (plugin.mcVersion.isGreaterThanOrEqualTo(8)) { // 1.8才提供这个方法
+                    if (plugin.mcVersion.isGreaterOrEqual(8)) { // 1.8才提供这个方法
                         meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
                     }
                 }
@@ -230,7 +230,7 @@ public class ICCommand implements TabExecutor {
                 sendMessage(sender, Language.commandTypeNotItem);
                 return;
             }
-            if (plugin.mcVersion.isGreaterThanOrEqualTo(14) && item.getItemMeta() != null && item.getItemMeta().hasCustomModelData()) {
+            if (plugin.mcVersion.isGreaterOrEqual(14) && item.getItemMeta() != null && item.getItemMeta().hasCustomModelData()) {
                 sendMessage(sender, Language.replaceArgs(Language.commandType, item.getType() + " (CustomModel:" + item.getItemMeta().getCustomModelData() + ")"));
             } else {
                 sendMessage(sender, Language.replaceArgs(Language.commandType, item.getType()));

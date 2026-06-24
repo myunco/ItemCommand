@@ -154,7 +154,7 @@ public class PlayerInvolveEventListener implements Listener {
                     useItem(player, item, stack, player.getInventory().getHeldItemSlot());
                 }
             }
-            if (mcVersion.isGreaterThanOrEqualTo(9)) {
+            if (mcVersion.isGreaterOrEqual(9)) {
                 stack = player.getInventory().getItemInOffHand();
                 if (stack.getType() != Material.AIR) {
                     Item item = ItemInfo.matchItem(player, stack, Trigger.OFFHAND_HIT);
